@@ -51,7 +51,7 @@ function spettacoli_post_where_previous($original) {
 
 	$where 	.= " AND tt.term_id IN (" . implode( ',', $term_array ) . ")";
 
-	$evDate = array_pop(get_post_meta($post->ID, "cartellone_data_sort"));
+	$evDate = get_post_meta($post->ID, "cartellone_data_sort")[0];
 	$evYear = date("Y", $evDate);
 	// Theatrical season starts on September 1st
 	if (($evDate < mktime(0,0,0,9,1,$evYear))) {
@@ -79,7 +79,7 @@ function spettacoli_post_where_next($original) {
 
 	$where 	.= " AND tt.term_id IN (" . implode( ',', $term_array ) . ")";
 
-	$evDate = array_pop(get_post_meta($post->ID, "cartellone_data_sort"));
+	$evDate = get_post_meta($post->ID, "cartellone_data_sort")[0];
 	$evYear = date("Y", $evDate);
 	// Theatrical season starts on September 1st
 	if (($evDate < mktime(0,0,0,9,1,$evYear))) {

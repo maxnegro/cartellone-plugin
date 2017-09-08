@@ -60,7 +60,6 @@ class Cartellone_Public {
 		add_filter('single_template', array($this, 'get_single_spettacoli_template'));
 		add_shortcode('stagione', array($this, 'stagione_shortcode'));
 
-
 	}
 
 	public function get_single_spettacoli_template($single_template) {

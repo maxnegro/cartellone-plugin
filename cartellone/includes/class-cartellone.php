@@ -237,9 +237,10 @@ class Cartellone {
 			"capability_type" => "post",
 			"map_meta_cap" => true,
 			"hierarchical" => false,
+			// "rewrite" => false, // custom rewrite elsewhere in code
 			"rewrite" => array( "slug" => "spettacoli", "with_front" => true ),
 			"query_var" => true,
-			"supports" => array( "title", "editor", "thumbnail" ),
+			"supports" => array( "title", "slug", "editor", "thumbnail" ),
 		);
 		register_post_type( "spettacoli", $args );
 
@@ -312,5 +313,65 @@ class Cartellone {
 	public function define_init_hooks() {
 		add_action('init', array($this, 'register_custompost_type'));
 		add_action('init', array($this, 'register_custompost_taxonomy'));
+
+		add_action('pre_get_posts', array($this, 'cartellone_pre_get_posts'));
+		add_action('init', array($this, 'cartellone_custom_rewrite_rule'));
+
+		add_filter('post_type_link', array($this, 'cartellone_change_link'), 10, 2);
+
+	}
+
+	// Helper function for custom rewrite rule
+	public function cartellone_pre_get_posts( $query ) {
+		if (isset($_GET['cartellone_ssn'])) {
+			$meta_query = array(
+				array(
+					'key' => 'cartellone_data_sort',
+					'value' => array(mktime(0, 0, 0, 9, 1, substr($_GET['cartellone_ssn'], 0, 4)), mktime(0, 0, 0, 9, 1, substr($_GET['cartellone_ssn']+1, 0, 4))),
+					'compare' => 'BETWEEN',
+					'type' => 'NUMERIC'
+				)
+			);
+			$query->set('meta_query', $meta_query);
+		}
+	}
+
+	// Custom rewrite rule
+	public function cartellone_custom_rewrite_rule() {
+		add_rewrite_rule(
+			'^spettacoli/([0-9]+-[0-9]+)/([^/]+)$',
+			'index.php?post_type=spettacoli&cartellone_ssn=$matches[1]&name=$matches[2]',
+			'top'
+		);
+		flush_rewrite_rules();
+	}
+
+	public function cartellone_change_link($permalink, $post) {
+		if ('spettacoli' == get_post_type($post)) {
+			$evDate = get_post_meta($post->ID, "cartellone_data_sort");
+			if (is_array($evDate) && array_key_exists(0, $evDate)) {
+				$evDate = $evDate[0];
+			} else {
+				$evDate = 0;
+			}
+			$evYear = date("Y", $evDate);
+			// Theatrical season starts on September 1st
+			if (($evDate < mktime(0,0,0,9,1,$evYear))) {
+				$evYear -= 1;
+			}
+
+			$slug="";
+			if (false !== strpos($permalink, '%spettacoli')) {
+				$slug = '%spettacoli%';
+			} elseif ( $post->post_name ) {
+				$slug = $post->post_name;
+			} else {
+				$slug = sanitize_title($post->post_title);
+			}
+
+			$permalink = sprintf("%s/spettacoli/%04d-%04d/%s", get_home_url(), $evYear, $evYear+1, $slug);
+		}
+
+		return $permalink;
 	}
 }

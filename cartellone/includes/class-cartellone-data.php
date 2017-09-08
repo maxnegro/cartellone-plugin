@@ -172,7 +172,7 @@ class Cartellone_Data {
       $payload["offers"] = array (
         "@type" => "Offer",
         "url" => $this->event["vivaticket"],
-        "validFrom" => date("c", mktime(0,0,0,10,26,2017))
+        "validFrom" => date("c", mktime(0,0,0,10,26,2017)) // Vedi nota sopra, TODO: per la data di inizio prevendite
       );
     }
     return $payload;
