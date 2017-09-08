@@ -122,21 +122,6 @@ class Cartellone_Data {
     return $this->event;
   }
 
-  // public function locations() {
-  //   if (empty($this->post_id)) {
-  //     return NULL;
-  //   }
-  //   $ospedali = get_terms('iomn_strutture', 'hide_empty=0');
-  //   $selezione = wp_get_object_terms($this->post_id, 'iomn_strutture');
-  //   $dove = "";
-  //   foreach ($ospedali as &$ospedale) {
-  //     if (!is_wp_error($selezione) && !empty($selezione) && !strcmp($ospedale->slug, $selezione[0]->slug)) {
-  //       $ospedale->selected = true;
-  //     }
-  //   }
-  //   return $ospedali;
-  // }
-  //
   // Check per verificare la possibilità di acquistare biglietti online sul
 	// circuito VivaTicket. Al momento un controllo statico, da aggiornare anno
 	// per anno, TODO: si potrebbe creare apposita pagina di configurazione.
@@ -144,4 +129,50 @@ class Cartellone_Data {
 		return (time() > mktime(0,0,0,10,26,2017));
 	}
 
+  // Generate schema.org markup for current event
+  public function get_microdata() {
+    $payload = array(
+      "@context" => "http://schema.org",
+      "@type" => "Event",
+      "location" => array(
+        "@type" => "Place",
+        "name" => "Teatro Comunale Bibiena",
+        "address" => array(
+          "@type" => "PostalAddress",
+          "streetAddress" => "Via 2 Agosto 1980 n.114",
+          "addressLocality" => "S.Agata Bolognese",
+          "postalCode" => "40019",
+          "addressRegion" => "BO",
+          "addressCountry" => "IT"
+        ),
+      ),
+      "startDate" => date("c", $this->event['data']),
+      "performer" => array(
+        "@Type" => "PerforminGroup",
+        "name" => $this->event["protagonisti"]
+      )
+    );
+    $evPostObj = get_post($this->post_id, OBJECT, "display");
+    if (is_object($evPostObj)) {
+      if (!empty($evPostObj->post_title)) {
+        $payload["name"] = $evPostObj->post_title;
+      }
+      if (!empty($evPostObj->post_content)) {
+        $payload["description"] = apply_filters('the_content', $evPostObj->post_content);
+      }
+    }
+    if ($evlink = get_permalink($this->post_id)) {
+      $payload["url"] = $evlink;
+    }
+    if (has_post_thumbnail($this->post_id)) {
+      $payload["image"] = get_the_post_thumbnail_url($this->post_id, "full");
+    }
+    if (!empty($this->event["vivaticket"])) {
+      $payload["offers"] = array (
+        "@type" => "Offer",
+        "url" => $this->event["vivaticket"],
+        "validFrom" => date("c", mktime(0,0,0,10,26,2017))
+      );
+    }
+  }
 }
