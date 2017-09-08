@@ -130,13 +130,14 @@ class Cartellone_Data {
 	}
 
   // Generate schema.org markup for current event
-  public function get_microdata() {
+  public function get_microdata_json_array() {
     $payload = array(
       "@context" => "http://schema.org",
       "@type" => "Event",
       "location" => array(
         "@type" => "Place",
         "name" => "Teatro Comunale Bibiena",
+        "url" => "http://www.teatrobibiena.it/",
         "address" => array(
           "@type" => "PostalAddress",
           "streetAddress" => "Via 2 Agosto 1980 n.114",
@@ -146,16 +147,16 @@ class Cartellone_Data {
           "addressCountry" => "IT"
         ),
       ),
-      "startDate" => date("c", $this->event['data']),
+      "startDate" => date("Ymd\T", $this->event['data']) . $this->event["ora"],
       "performer" => array(
-        "@Type" => "PerforminGroup",
+        "@type" => "PerformingGroup",
         "name" => $this->event["protagonisti"]
       )
     );
     $evPostObj = get_post($this->post_id, OBJECT, "display");
     if (is_object($evPostObj)) {
       if (!empty($evPostObj->post_title)) {
-        $payload["name"] = $evPostObj->post_title;
+        $payload["name"] = $evPostObj->post_title . " - " . $this->event["protagonisti"];
       }
       if (!empty($evPostObj->post_content)) {
         $payload["description"] = apply_filters('the_content', $evPostObj->post_content);
@@ -174,5 +175,10 @@ class Cartellone_Data {
         "validFrom" => date("c", mktime(0,0,0,10,26,2017))
       );
     }
+    return $payload;
+  }
+
+  public function get_microdata_json() {
+    return wp_json_encode($this->get_microdata_json_array(), JSON_UNESCAPED_SLASHES);
   }
 }

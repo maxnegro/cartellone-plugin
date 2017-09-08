@@ -153,12 +153,18 @@ class Cartellone_Public {
 
 		if ($the_query->have_posts()) {
 			ob_start();
+			$microdata=array();
 			while ($the_query->have_posts()) {
 				$the_query->the_post();
 				$evdata = new Cartellone_Data(get_the_ID());
 				$ev=$evdata->getData();
+				array_push($microdata, $evdata->get_microdata_json_array());
 				include(dirname( __FILE__ ) . '/partials/cartellone-public-stagione-shortcode.php');
 			}
+			echo '<script type="application/ld+json">';
+			echo wp_json_encode($microdata, JSON_UNESCAPED_SLASHES);
+			echo "</script>\n";
+
 			wp_reset_postdata();
 			return ob_get_clean();
 		} else {
