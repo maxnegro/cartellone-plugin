@@ -1,0 +1,33 @@
+/**
+ * All of the CSS for your public-facing functionality should be
+ * included in this file.
+ */
+ .entry-content h1, .entry-content h2, .entry-content h3, .entry-content h4, .entry-content h5 {
+    margin-top: 5px !important;
+}
+
+.post-date .post-date-day {
+	display: block;
+	font-size: 31px;
+	line-height: 34px;
+	color: #FFF;
+	font-weight: 700;
+}
+
+.post-date .post-date-month {
+	display: block;
+	font-size: 18px;
+	line-height: 24px;
+	color: #FFF;
+	font-weight: 500;
+	text-transform: uppercase;
+}
+
+.post-date .post-date-year {
+	display: block;
+	font-size: 20px;
+	line-height: 24px;
+	color: #FFF;
+	font-weight: 700;
+	text-transform: uppercase;
+}
