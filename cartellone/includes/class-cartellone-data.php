@@ -147,7 +147,7 @@ class Cartellone_Data {
           "addressCountry" => "IT"
         ),
       ),
-      "startDate" => date("Ymd\T", $this->event['data']) . $this->event["ora"],
+      "startDate" => date("Y-m-d\T", $this->event['data']) . $this->event["ora"] . ":00",
       "performer" => array(
         "@type" => "PerformingGroup",
         "name" => $this->event["protagonisti"]
