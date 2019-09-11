@@ -158,6 +158,8 @@ class Cartellone {
 		$this->loader->add_action( 'add_meta_boxes', $plugin_admin, 'add_meta_box' );
 		$this->loader->add_action( 'save_post', $plugin_admin, 'save_meta_box');
 
+		$this->loader->add_filter( 'manage_spettacoli_posts_columns', $plugin_admin, 'manage_posts_columns');
+		$this->loader->add_filter( 'manage_spettacoli_posts_custom_column', $plugin_admin, 'manage_posts_custom_column', 10, 2);
 	}
 
 	/**

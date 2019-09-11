@@ -65,6 +65,7 @@ class Cartellone_Admin {
 	*/
 	private function load_dependencies($plugin_name, $version)	{
 		require_once ( plugin_dir_path(__FILE__) . "/../includes/class-cartellone-data.php" );
+		// require_once ( plugin_dir_path(__FILE__) . "/../includes/class-cartellone-admin-list.php" );
 		// require_once ( plugin_dir_path(__FILE__) . "/../includes/class-iomn-eventi-admin-prenotazioni-list.php" );
 		// require_once ( plugin_dir_path(__FILE__) . "/../includes/class-iomn-eventi-admin-options.php" );
 	}
@@ -146,5 +147,36 @@ class Cartellone_Admin {
 		$mbdata->save_data();
 	}
 
+	public function manage_posts_columns ($columns) {
+		$columns = [
+			'cb' => $columns['cb'],
+			'title' => "Titolo",
+			'protagonisti' => "Protagonisti",
+			'data' => "Data",
+			'vivaticket' => '<span class="dashicons dashicons-tickets-alt"></span>',
+			'date' => "Stato"
+		];
+		return $columns;
+	}
 
+	public function manage_posts_custom_column ($column, $post_id) {
+		$cData = new Cartellone_Data($post_id);
+		$datiEvento = $cData->getData();
+		switch ($column) {
+			case 'protagonisti':
+				echo $datiEvento[$column];
+				break;
+			case 'data':
+				echo date('D d/m/Y', $datiEvento['data']);
+				break;
+			case 'vivaticket':
+				if (!empty($datiEvento['vivaticket'])) {
+					printf('<a href="%s" target="_new"><span class="dashicons dashicons-tickets-alt"></span></a>', $datiEvento['vivaticket']);
+				}
+				break;
+			default:
+			  break;
+		}
+
+	}
 }
