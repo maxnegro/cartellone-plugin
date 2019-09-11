@@ -126,7 +126,7 @@ class Cartellone_Data {
 	// circuito VivaTicket. Al momento un controllo statico, da aggiornare anno
 	// per anno, TODO: si potrebbe creare apposita pagina di configurazione.
 	public function season_open() {
-		return (time() > mktime(0,0,0,10,25,2018));
+		return (time() > mktime(0,0,0,10,24,2019));
 	}
 
   // Generate schema.org markup for current event
@@ -172,7 +172,7 @@ class Cartellone_Data {
       $payload["offers"] = array (
         "@type" => "Offer",
         "url" => $this->event["vivaticket"],
-        "validFrom" => date("c", mktime(0,0,0,10,26,2017)) // Vedi nota sopra, TODO: per la data di inizio prevendite
+        "validFrom" => date("c", $this->season_open())
       );
     }
     return $payload;
