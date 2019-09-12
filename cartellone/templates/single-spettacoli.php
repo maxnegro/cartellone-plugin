@@ -110,7 +110,7 @@ get_header(); ?>
 			?>
 		</div>
 		<div class="container">
-			<div style="float:right; margin-top: 25px;">
+			<div style="float:right; margin-top: 25px; margin-left: 1em;">
 				<?php
 				$terms = get_the_terms($post, 'tipo');
 				if ($terms) {
