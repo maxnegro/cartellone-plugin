@@ -137,7 +137,7 @@ get_header(); ?>
 				echo "</center>\n";
 			}
 			?>
-			<h3><?php echo preg_replace('/\n/','<br>',$ev['credits']); ?></h3>
+			<h3 class="lineup"><?php echo preg_replace('/\n/','<br>',$ev['credits']); ?></h3>
 
 			<?php the_content(); ?>
 
