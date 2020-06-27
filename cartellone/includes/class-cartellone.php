@@ -329,7 +329,7 @@ class Cartellone {
 			$meta_query = array(
 				array(
 					'key' => 'cartellone_data_sort',
-					'value' => array(mktime(0, 0, 0, 9, 1, substr($_GET['cartellone_ssn'], 0, 4)), mktime(0, 0, 0, 9, 1, substr($_GET['cartellone_ssn']+1, 0, 4))),
+					'value' => array(mktime(0, 0, 0, 7, 1, substr($_GET['cartellone_ssn'], 0, 4)), mktime(0, 0, 0, 7, 1, substr($_GET['cartellone_ssn']+1, 0, 4))),
 					'compare' => 'BETWEEN',
 					'type' => 'NUMERIC'
 				)
@@ -358,7 +358,7 @@ class Cartellone {
 			}
 			$evYear = date("Y", $evDate);
 			// Theatrical season starts on September 1st
-			if (($evDate < mktime(0,0,0,9,1,$evYear))) {
+			if (($evDate < mktime(0,0,0,7,1,$evYear))) {
 				$evYear -= 1;
 			}
 

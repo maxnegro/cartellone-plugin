@@ -88,7 +88,11 @@
 
 			// if ((!empty($ev['vivaticket'])) && ($ev['data'] >= time())) {
 			if ((!empty($ev['vivaticket'])) && ($ev['data'] >= time()) && $evdata->season_open()) {
-				printf('Acquista online: <a href="%s" target="_blank"><img src="%s" alt="Acquista online"></a>', $ev['vivaticket'], plugins_url( '../img/vivaticket.png', __FILE__ ) );
+				if (strpos($ev['vivaticket'], "eventbrite.it") !== false) {
+					printf('Registrati gratuitamente: <a href="%s" target="_blank"><img src="%s" alt="Registrazione gratuita"></a>', $ev['vivaticket'], plugins_url( '../img/eventbrite.png', __FILE__ ) );					
+				} else {
+					printf('Acquista online: <a href="%s" target="_blank"><img src="%s" alt="Acquista online"></a>', $ev['vivaticket'], plugins_url( '../img/vivaticket.png', __FILE__ ) );
+				}
 			}
 		?>
 	</div><!-- .entry-content -->
