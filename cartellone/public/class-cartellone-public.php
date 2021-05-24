@@ -143,7 +143,7 @@ class Cartellone_Public {
 			'meta_query' => array(
 				array(
 					'key' => 'cartellone_data_sort',
-					'value' => array(mktime(0, 0, 0, 7, 1, $attribute['anno']), mktime(0, 0, 0, 7, 1, $attribute['anno']+1)),
+					'value' => array(mktime(0, 0, 0, 6, 1, $attribute['anno']), mktime(0, 0, 0, 6, 1, $attribute['anno']+1)),
 					'compare' => 'BETWEEN',
 					'type' => 'NUMERIC'
 				)
