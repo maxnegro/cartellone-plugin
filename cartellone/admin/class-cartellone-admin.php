@@ -90,7 +90,7 @@ class Cartellone_Admin {
 		 */
 
 		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/cartellone-admin.css', array(), $this->version, 'all' );
-		wp_enqueue_style('jquery-style', 'http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css');
+		wp_enqueue_style('jquery-style', 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css');
 		wp_enqueue_style('jquery-timepicker-style', plugin_dir_url(__FILE__).'css/jquery.ui.timepicker.css', array('jquery-ui'), $this->version, 'all');
 
 	}
