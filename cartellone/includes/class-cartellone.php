@@ -358,7 +358,7 @@ class Cartellone {
 			}
 			$evYear = date("Y", $evDate);
 			// Theatrical season starts on September 1st
-			if (($evDate < mktime(0,0,0,7,1,$evYear))) {
+			if (($evDate < mktime(0,0,0,6,1,$evYear))) {
 				$evYear -= 1;
 			}
 
