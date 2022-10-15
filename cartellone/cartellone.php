@@ -24,6 +24,7 @@
  * Text Domain:       cartellone
  * Domain Path:       /languages
  * GitHub Plugin URI: maxnegro/cartellone-plugin
+ * Primary Branch:    master
  */
 
 // If this file is called directly, abort.
