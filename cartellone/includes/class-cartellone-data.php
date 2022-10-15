@@ -126,7 +126,7 @@ class Cartellone_Data {
 	// circuito VivaTicket. Al momento un controllo statico, da aggiornare anno
 	// per anno, TODO: si potrebbe creare apposita pagina di configurazione.
 	public function season_open() {
-		return (time() > mktime(0,0,0,10,24,2019));
+		return (time() > mktime(0,0,0,11,2,2022));
 	}
 
   // Generate schema.org markup for current event

@@ -8,21 +8,22 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              http://example.com
- * @since             1.0.0
- * @package           Plugin_Name
+ * @link              https://github.com/maxnegro/cartellone-plugin
+ * @license           GPL-2.0-or-later
+ * @package           cartellone
  *
  * @cartellone
  * Plugin Name:       Cartellone Teatro Bibiena
- * Plugin URI:        http://example.com/plugin-name-uri/
+ * Plugin URI:        https://github.com/maxnegro/cartellone-plugin
  * Description:       Supporto per l'inserimento spettacoli in cartellone
- * Version:           1.0.0
+ * Version:           1.0.1
  * Author:            Massimiliano Masserelli
  * Author URI:        http://photomarketing.it
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       cartellone
  * Domain Path:       /languages
+ * GitHub Plugin URI: maxnegro/cartellone-plugin
  */
 
 // If this file is called directly, abort.
