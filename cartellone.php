@@ -16,7 +16,7 @@
  * Plugin Name:       Cartellone Teatro Bibiena
  * Plugin URI:        https://github.com/maxnegro/cartellone-plugin
  * Description:       Supporto per l'inserimento spettacoli in cartellone
- * Version:           1.0.1
+ * Version:           1.0.2
  * Author:            Massimiliano Masserelli
  * Author URI:        http://photomarketing.it
  * License:           GPL-2.0+
