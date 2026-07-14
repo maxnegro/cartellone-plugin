@@ -19,6 +19,7 @@ class Settings {
 		'season_start_day'   => '01',
 		'season_start_month' => '09',
 		'shortcode_cache_ttl' => HOUR_IN_SECONDS,
+		'ticket_sale_start'  => '',
 	);
 
 	/**
@@ -32,6 +33,10 @@ class Settings {
 	public function __construct() {
 		$saved = get_option( $this->option_name, array() );
 		$this->settings = wp_parse_args( $saved, $this->defaults );
+
+		if ( ! isset( $this->settings['ticket_sale_start'] ) || $this->settings['ticket_sale_start'] === '' ) {
+			$this->settings['ticket_sale_start'] = mktime( 0, 0, 0, 11, 2, 2022 );
+		}
 	}
 
 	/**
@@ -86,6 +91,14 @@ class Settings {
 			'cartellone',
 			'cartellone_general'
 		);
+
+		add_settings_field(
+			'ticket_sale_start',
+			__( 'Ticket sale start date', 'cartellone' ),
+			array( $this, 'render_ticket_sale_start_field' ),
+			'cartellone',
+			'cartellone_general'
+		);
 	}
 
 	/**
@@ -107,6 +120,15 @@ class Settings {
 
 		if ( isset( $input['shortcode_cache_ttl'] ) ) {
 			$sanitized['shortcode_cache_ttl'] = max( 0, (int) $input['shortcode_cache_ttl'] );
+		}
+
+		if ( isset( $input['ticket_sale_start'] ) && $input['ticket_sale_start'] !== '' ) {
+			$timestamp = strtotime( $input['ticket_sale_start'] );
+			if ( $timestamp ) {
+				$sanitized['ticket_sale_start'] = $timestamp;
+			} else {
+				$sanitized['ticket_sale_start'] = $this->get( 'ticket_sale_start', mktime( 0, 0, 0, 11, 2, 2022 ) );
+			}
 		}
 
 		return $sanitized;
@@ -160,6 +182,16 @@ class Settings {
 		?>
 		<input type="number" name="cartellone_settings[shortcode_cache_ttl]" value="<?php echo esc_attr( $value ); ?>" min="0" class="small-text">
 		<p class="description"><?php esc_html_e( '0 disables caching.', 'cartellone' ); ?></p>
+		<?php
+	}
+
+	/**
+	 * Render ticket sale start field.
+	 */
+	public function render_ticket_sale_start_field() {
+		$value = $this->get( 'ticket_sale_start' );
+		?>
+		<input type="date" name="cartellone_settings[ticket_sale_start]" value="<?php echo esc_attr( date( 'Y-m-d', $value ) ); ?>">
 		<?php
 	}
 

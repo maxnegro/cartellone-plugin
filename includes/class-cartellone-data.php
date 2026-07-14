@@ -166,9 +166,16 @@ class Data {
 	 *
 	 * @return bool
 	 */
-	public function season_open() {
-		return time() > mktime( 0, 0, 0, 11, 2, 2022 );
-	}
+  public function season_open() {
+    $settings = get_option( 'cartellone_settings', array() );
+    $sale_start = isset( $settings['ticket_sale_start'] ) ? (int) $settings['ticket_sale_start'] : 0;
+
+    if ( ! $sale_start ) {
+      $sale_start = mktime( 0, 0, 0, 11, 2, 2022 );
+    }
+
+    return time() > $sale_start;
+  }
 
 	/**
 	 * Generate schema.org microdata array.
