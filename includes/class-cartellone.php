@@ -224,6 +224,14 @@ class Cartellone {
 	 * @param \WP_Query $query Query object.
 	 */
 	public function pre_get_posts( $query ) {
+		global $pagenow;
+
+		if ( is_admin() && $query->is_main_query() && 'edit.php' === $pagenow && CARTELLONE_CPT === $query->get( 'post_type' ) ) {
+			$query->set( 'meta_key', CARTELLONE_META_SORT );
+			$query->set( 'orderby', 'meta_value_num' );
+			$query->set( 'order', 'DESC' );
+		}
+
 		if ( ! is_admin() && isset( $_GET['cartellone_ssn'] ) ) {
 			$season_year = sanitize_text_field( $_GET['cartellone_ssn'] );
 			$year        = (int) substr( $season_year, 0, 4 );
