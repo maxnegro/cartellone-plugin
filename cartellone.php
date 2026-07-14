@@ -3,11 +3,6 @@
 /**
  * The plugin bootstrap file
  *
- * This file is read by WordPress to generate the plugin information in the plugin
- * admin area. This file also includes all of the dependencies used by the plugin,
- * registers the activation and deactivation functions, and defines a function
- * that starts the plugin.
- *
  * @link              https://github.com/maxnegro/cartellone-plugin
  * @license           GPL-2.0-or-later
  * @package           cartellone
@@ -16,7 +11,7 @@
  * Plugin Name:       Cartellone Teatro Bibiena
  * Plugin URI:        https://github.com/maxnegro/cartellone-plugin
  * Description:       Supporto per l'inserimento spettacoli in cartellone
- * Version:           1.0.2
+ * Version:           2.0.0
  * Author:            Massimiliano Masserelli
  * Author URI:        http://photomarketing.it
  * License:           GPL-2.0+
@@ -32,46 +27,110 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+// Plugin constants.
+if ( ! defined( 'CARTELLONE_VERSION' ) ) {
+	define( 'CARTELLONE_VERSION', '2.0.0' );
+}
+
+if ( ! defined( 'CARTELLONE_CPT' ) ) {
+	define( 'CARTELLONE_CPT', 'spettacoli' );
+}
+
+if ( ! defined( 'CARTELLONE_TAX_STAGIONE' ) ) {
+	define( 'CARTELLONE_TAX_STAGIONE', 'stagione' );
+}
+
+if ( ! defined( 'CARTELLONE_TAX_TIPO' ) ) {
+	define( 'CARTELLONE_TAX_TIPO', 'tipo' );
+}
+
+if ( ! defined( 'CARTELLONE_META_DATA' ) ) {
+	define( 'CARTELLONE_META_DATA', 'cartellone_data' );
+}
+
+if ( ! defined( 'CARTELLONE_META_SORT' ) ) {
+	define( 'CARTELLONE_META_SORT', 'cartellone_data_sort' );
+}
+
+if ( ! defined( 'CARTELLONE_META_DATE' ) ) {
+	define( 'CARTELLONE_META_DATE', 'cartellone_data_data' );
+}
+
+if ( ! defined( 'CARTELLONE_META_ORA' ) ) {
+	define( 'CARTELLONE_META_ORA', 'cartellone_ora' );
+}
+
+if ( ! defined( 'CARTELLONE_META_PRODUZIONE' ) ) {
+	define( 'CARTELLONE_META_PRODUZIONE', 'cartellone_produzione' );
+}
+
+if ( ! defined( 'CARTELLONE_META_PROTAGONISTI' ) ) {
+	define( 'CARTELLONE_META_PROTAGONISTI', 'cartellone_protagonisti' );
+}
+
+if ( ! defined( 'CARTELLONE_META_CREDITS' ) ) {
+	define( 'CARTELLONE_META_CREDITS', 'cartellone_credits' );
+}
+
+if ( ! defined( 'CARTELLONE_META_VIVATICKET' ) ) {
+	define( 'CARTELLONE_META_VIVATICKET', 'cartellone_vivaticket' );
+}
+
+if ( ! defined( 'CARTELLONE_DB_VERSION' ) ) {
+	define( 'CARTELLONE_DB_VERSION', '2.0.0' );
+}
+
+if ( ! defined( 'CARTELLONE_PATH' ) ) {
+	define( 'CARTELLONE_PATH', plugin_dir_path( __FILE__ ) );
+}
+
+if ( ! defined( 'CARTELLONE_URL' ) ) {
+	define( 'CARTELLONE_URL', plugin_dir_url( __FILE__ ) );
+}
+
+// Composer autoloader.
+$autoload = CARTELLONE_PATH . 'vendor/autoload.php';
+if ( file_exists( $autoload ) ) {
+	require_once $autoload;
+} else {
+	require_once CARTELLONE_PATH . 'includes/class-cartellone.php';
+	require_once CARTELLONE_PATH . 'includes/class-cartellone-data.php';
+	require_once CARTELLONE_PATH . 'includes/class-cartellone-settings.php';
+	require_once CARTELLONE_PATH . 'includes/class-cartellone-i18n.php';
+	require_once CARTELLONE_PATH . 'includes/class-cartellone-activator.php';
+	require_once CARTELLONE_PATH . 'includes/class-cartellone-deactivator.php';
+	require_once CARTELLONE_PATH . 'admin/class-cartellone-admin.php';
+	require_once CARTELLONE_PATH . 'public/class-cartellone-public.php';
+}
+
 /**
  * The code that runs during plugin activation.
- * This action is documented in includes/class-plugin-name-activator.php
  */
 function activate_cartellone() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-cartellone-activator.php';
-	Cartellone_Activator::activate();
+	$activator = new \Cartellone\Activator();
+	$activator->activate();
 }
 
 /**
  * The code that runs during plugin deactivation.
- * This action is documented in includes/class-plugin-name-deactivator.php
  */
 function deactivate_cartellone() {
-	require_once plugin_dir_path( __FILE__ ) . 'includes/class-cartellone-deactivator.php';
-	Cartellone_Deactivator::deactivate();
+	$deactivator = new \Cartellone\Deactivator();
+	$deactivator->deactivate();
 }
 
 register_activation_hook( __FILE__, 'activate_cartellone' );
 register_deactivation_hook( __FILE__, 'deactivate_cartellone' );
 
-/**
- * The core plugin class that is used to define internationalization,
- * admin-specific hooks, and public-facing site hooks.
- */
-require plugin_dir_path( __FILE__ ) . 'includes/class-cartellone.php';
+// Load plugin.
+add_action(
+	'plugins_loaded',
+	function () {
+		if ( ! class_exists( '\Cartellone\Cartellone' ) ) {
+			return;
+		}
 
-/**
- * Begins execution of the plugin.
- *
- * Since everything within the plugin is registered via hooks,
- * then kicking off the plugin from this point in the file does
- * not affect the page life cycle.
- *
- * @since    1.0.0
- */
-function run_cartellone() {
-
-	$plugin = new Cartellone();
-	$plugin->run();
-
-}
-run_cartellone();
+		$plugin = new \Cartellone\Cartellone();
+		$plugin->run();
+	}
+);

@@ -1,182 +1,250 @@
 <?php
 
-/**
- * The admin-specific functionality of the plugin.
- *
- * @link       http://example.com
- * @since      1.0.0
- *
- * @package    Cartellone
- * @subpackage Cartellone/admin
- */
+namespace Cartellone;
 
 /**
- * The admin-specific functionality of the plugin.
- *
- * Defines the plugin name, version, and two examples hooks for how to
- * enqueue the admin-specific stylesheet and JavaScript.
- *
- * @package    Cartellone
- * @subpackage Cartellone/admin
- * @author     Your Name <email@example.com>
+ * Admin functionality.
  */
-class Cartellone_Admin {
+class Admin {
 
 	/**
-	 * The ID of this plugin.
+	 * Settings instance.
 	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $plugin_name    The ID of this plugin.
+	 * @var Settings
 	 */
-	private $plugin_name;
+	private $settings;
 
 	/**
-	 * The version of this plugin.
+	 * Data instance.
 	 *
-	 * @since    1.0.0
-	 * @access   private
-	 * @var      string    $version    The current version of this plugin.
+	 * @var Data
 	 */
-	private $version;
+	private $data;
 
 	/**
-	 * Initialize the class and set its properties.
+	 * Plugin slug.
 	 *
-	 * @since    1.0.0
-	 * @param      string    $plugin_name       The name of this plugin.
-	 * @param      string    $version    The version of this plugin.
+	 * @var string
 	 */
-	public function __construct( $plugin_name, $version ) {
+	private $plugin_name = 'cartellone';
 
-		$this->plugin_name = $plugin_name;
-		$this->version = $version;
-
-		$this->load_dependencies(	$this->plugin_name, $this->version );
-
-
+	/**
+	 * Constructor.
+	 *
+	 * @param Settings $settings Settings instance.
+	 * @param Data     $data Data instance.
+	 */
+	public function __construct( Settings $settings, Data $data ) {
+		$this->settings = $settings;
+		$this->data     = $data;
 	}
 
 	/**
-	* Loads class dependencies
-	*
-	* @since    1.0.0
-	*
-	*/
-	private function load_dependencies($plugin_name, $version)	{
-		require_once ( plugin_dir_path(__FILE__) . "/../includes/class-cartellone-data.php" );
-		// require_once ( plugin_dir_path(__FILE__) . "/../includes/class-cartellone-admin-list.php" );
-		// require_once ( plugin_dir_path(__FILE__) . "/../includes/class-iomn-eventi-admin-prenotazioni-list.php" );
-		// require_once ( plugin_dir_path(__FILE__) . "/../includes/class-iomn-eventi-admin-options.php" );
+	 * Run hooks.
+	 */
+	public function run() {
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_styles' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ) );
+		add_action( 'save_post_spettacoli', array( $this, 'save_meta_box' ) );
+		add_filter( 'manage_spettacoli_posts_columns', array( $this, 'manage_posts_columns' ) );
+		add_action( 'manage_spettacoli_posts_custom_column', array( $this, 'manage_posts_custom_column' ), 10, 2 );
+
+		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 	}
 
 	/**
-	 * Register the stylesheets for the admin area.
-	 *
-	 * @since    1.0.0
+	 * Enqueue admin styles.
 	 */
 	public function enqueue_styles() {
+		$screen = get_current_screen();
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Cartellone_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Cartellone_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+		if ( ! $screen instanceof \WP_Screen ) {
+			return;
+		}
 
-		wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/cartellone-admin.css', array(), $this->version, 'all' );
-		wp_enqueue_style('jquery-style', 'https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.2/themes/smoothness/jquery-ui.css');
-		wp_enqueue_style('jquery-timepicker-style', plugin_dir_url(__FILE__).'css/jquery.ui.timepicker.css', array('jquery-ui'), $this->version, 'all');
+		if ( 'spettacoli' === $screen->post_type ) {
+			wp_enqueue_style(
+				$this->plugin_name . '-admin',
+				CARTELLONE_URL . 'admin/css/cartellone-admin.css',
+				array(),
+				CARTELLONE_VERSION,
+				'all'
+			);
 
+			wp_enqueue_style(
+				'jquery-ui',
+				'https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css',
+				array(),
+				null
+			);
+
+			wp_enqueue_style(
+				$this->plugin_name . '-timepicker',
+				CARTELLONE_URL . 'admin/css/jquery.ui.timepicker.css',
+				array( 'jquery-ui' ),
+				CARTELLONE_VERSION,
+				'all'
+			);
+		}
 	}
 
 	/**
-	 * Register the JavaScript for the admin area.
-	 *
-	 * @since    1.0.0
+	 * Enqueue admin scripts.
 	 */
 	public function enqueue_scripts() {
+		$screen = get_current_screen();
 
-		/**
-		 * This function is provided for demonstration purposes only.
-		 *
-		 * An instance of this class should be passed to the run() function
-		 * defined in Cartellone_Loader as all of the hooks are defined
-		 * in that particular class.
-		 *
-		 * The Cartellone_Loader will then create the relationship
-		 * between the defined hooks and the functions defined in this
-		 * class.
-		 */
+		if ( ! $screen instanceof \WP_Screen ) {
+			return;
+		}
 
-		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/cartellone-admin.js', array( 'jquery' ), $this->version, false );
-		wp_enqueue_script('jquery-ui-spinner');
-		wp_enqueue_script('jquery-ui-timepicker', plugin_dir_url(__FILE__).'js/jquery.ui.timepicker.js', array('jquery-ui-core'), $this->version, false);
-		wp_enqueue_script('jquery-ui-datepicker');
+		if ( 'spettacoli' === $screen->post_type ) {
+			wp_enqueue_script(
+				'jquery-ui-timepicker',
+				CARTELLONE_URL . 'admin/js/jquery.ui.timepicker.js',
+				array( 'jquery-ui-datepicker' ),
+				CARTELLONE_VERSION,
+				false
+			);
 
+			wp_enqueue_script(
+				$this->plugin_name . '-admin',
+				CARTELLONE_URL . 'admin/js/cartellone-admin.js',
+				array( 'jquery', 'jquery-ui-datepicker', 'jquery-ui-timepicker' ),
+				CARTELLONE_VERSION,
+				false
+			);
+		}
 	}
 
 	/**
-	* Renders meta box html.
-	*
-	* @since    1.0.0
-	*/
-	public function render_meta_box($post)	{
-		$evdata = new Cartellone_Data($post->ID);
-		require plugin_dir_path(__FILE__).'partials/cartellone-admin-render-meta-box.php';
+	 * Add settings page under Spettacoli menu.
+	 */
+	public function add_admin_menu() {
+		add_submenu_page(
+			'edit.php?post_type=' . CARTELLONE_CPT,
+			__( 'Cartellone Settings', 'cartellone' ),
+			__( 'Settings', 'cartellone' ),
+			'manage_options',
+			'cartellone',
+			array( $this, 'render_settings_page' )
+		);
 	}
 
 	/**
-	* Provides meta box for editing data.
-	*
-	* @since    1.0.0
-	*/
-	public function add_meta_box()
-	{
-		add_meta_box($this->plugin_name, 'Dettagli spettacolo', array($this, 'render_meta_box'), 'spettacoli', 'normal', 'core');
+	 * Render settings page.
+	 */
+	public function render_settings_page() {
+		?>
+		<div class="wrap">
+			<h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
+			<form action="options.php" method="post">
+				<?php
+				settings_fields( 'cartellone' );
+				do_settings_sections( 'cartellone' );
+				submit_button();
+				?>
+			</form>
+		</div>
+		<?php
 	}
 
-	public function save_meta_box($post_id) {
-		$mbdata = new Cartellone_Data( $post_id );
-		$mbdata->load_form_fields();
+	/**
+	 * Render meta box.
+	 *
+	 * @param \WP_Post $post Post object.
+	 */
+	public function render_meta_box( $post ) {
+		wp_nonce_field( '_cartellone_nonce', 'cartellone_nonce' );
+
+		$evdata = new Data( $post->ID );
+		$ev     = $evdata->get_data();
+
+		require CARTELLONE_PATH . 'admin/partials/cartellone-admin-render-meta-box.php';
+	}
+
+	/**
+	 * Add meta box.
+	 */
+	public function add_meta_box() {
+		add_meta_box(
+			$this->plugin_name,
+			__( 'Event details', 'cartellone' ),
+			array( $this, 'render_meta_box' ),
+			'spettacoli',
+			'normal',
+			'core'
+		);
+	}
+
+	/**
+	 * Save meta box.
+	 *
+	 * @param int $post_id Post ID.
+	 */
+	public function save_meta_box( $post_id ) {
+		if ( ! isset( $_POST['cartellone_nonce'] ) || ! wp_verify_nonce( $_POST['cartellone_nonce'], '_cartellone_nonce' ) ) {
+			return;
+		}
+
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return;
+		}
+
+		$mbdata = new Data( $post_id );
+		$mbdata->hydrate_from_request();
 		$mbdata->save_data();
 	}
 
-	public function manage_posts_columns ($columns) {
-		$columns = [
-			'cb' => $columns['cb'],
-			'title' => "Titolo",
-			'protagonisti' => "Protagonisti",
-			'data' => "Data",
-			'vivaticket' => '<span class="dashicons dashicons-tickets-alt"></span>',
-			'date' => "Stato"
-		];
-		return $columns;
+	/**
+	 * Manage posts columns.
+	 *
+	 * @param array $columns Columns.
+	 * @return array
+	 */
+	public function manage_posts_columns( $columns ) {
+		return array(
+			'cb'          => $columns['cb'],
+			'title'       => __( 'Title', 'cartellone' ),
+			'protagonisti' => __( 'Cast', 'cartellone' ),
+			'data'        => __( 'Date', 'cartellone' ),
+			'vivaticket'  => '<span class="dashicons dashicons-tickets-alt"></span>',
+			'date'        => __( 'Status', 'cartellone' ),
+		);
 	}
 
-	public function manage_posts_custom_column ($column, $post_id) {
-		$cData = new Cartellone_Data($post_id);
-		$datiEvento = $cData->getData();
-		switch ($column) {
+	/**
+	 * Manage posts custom column.
+	 *
+	 * @param string $column Column name.
+	 * @param int    $post_id Post ID.
+	 */
+	public function manage_posts_custom_column( $column, $post_id ) {
+		$cdata = new Data( $post_id );
+		$event = $cdata->get_data();
+
+		switch ( $column ) {
 			case 'protagonisti':
-				echo $datiEvento[$column];
+				echo esc_html( $event['protagonisti'] ?? '' );
 				break;
 			case 'data':
-				echo date('D d/m/Y', $datiEvento['data']);
-				break;
-			case 'vivaticket':
-				if (!empty($datiEvento['vivaticket'])) {
-					printf('<a href="%s" target="_new"><span class="dashicons dashicons-tickets-alt"></span></a>', $datiEvento['vivaticket']);
+				if ( ! empty( $event['data'] ) ) {
+					echo esc_html( date_i18n( 'D d/m/Y', (int) $event['data'] ) );
 				}
 				break;
-			default:
-			  break;
+			case 'vivaticket':
+				if ( ! empty( $event['vivaticket'] ) ) {
+					printf(
+						'<a href="%s" target="_blank"><span class="dashicons dashicons-tickets-alt"></span></a>',
+						esc_url( $event['vivaticket'] )
+					);
+				}
+				break;
 		}
-
 	}
 }

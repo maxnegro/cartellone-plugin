@@ -1,47 +1,20 @@
 <?php
 
-/**
- * Define the internationalization functionality
- *
- * Loads and defines the internationalization files for this plugin
- * so that it is ready for translation.
- *
- * @link       http://example.com
- * @since      1.0.0
- *
- * @package    Cartellone
- * @subpackage Cartellone/includes
- */
+namespace Cartellone;
 
 /**
- * Define the internationalization functionality.
- *
- * Loads and defines the internationalization files for this plugin
- * so that it is ready for translation.
- *
- * @since      1.0.0
- * @package    Cartellone
- * @subpackage Cartellone/includes
- * @author     Your Name <email@example.com>
+ * Internationalization.
  */
-class Cartellone_i18n {
-
+class i18n {
 
 	/**
-	 * Load the plugin text domain for translation.
-	 *
-	 * @since    1.0.0
+	 * Load plugin textdomain.
 	 */
-	public function load_plugin_textdomain() {
-
+	public function run() {
 		load_plugin_textdomain(
 			'cartellone',
 			false,
-			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
+			dirname( plugin_basename( CARTELLONE_PATH . 'cartellone.php' ) ) . '/languages/'
 		);
-
 	}
-
-
-
 }
