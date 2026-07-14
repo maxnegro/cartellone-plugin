@@ -123,8 +123,6 @@ class Frontend {
 		global $wpdb;
 
 		$join .= " INNER JOIN {$wpdb->postmeta} AS m ON p.ID = m.post_id";
-		$join .= " INNER JOIN {$wpdb->term_relationships} AS tr ON p.ID = tr.object_id";
-		$join .= " INNER JOIN {$wpdb->term_taxonomy} AS tt ON tr.term_taxonomy_id = tt.term_taxonomy_id";
 
 		return $join;
 	}
@@ -136,7 +134,7 @@ class Frontend {
 	 * @return string
 	 */
 	public function post_sort_next( $orderby ) {
-		return 'ORDER BY m.meta_value ASC, p.post_title ASC LIMIT 1';
+		return 'ORDER BY CAST(m.meta_value AS UNSIGNED) ASC, p.post_title ASC, p.ID ASC LIMIT 1';
 	}
 
 	/**
@@ -146,7 +144,7 @@ class Frontend {
 	 * @return string
 	 */
 	public function post_sort_prev( $orderby ) {
-		return 'ORDER BY m.meta_value DESC, p.post_title DESC LIMIT 1';
+		return 'ORDER BY CAST(m.meta_value AS UNSIGNED) DESC, p.post_title DESC, p.ID DESC LIMIT 1';
 	}
 
 	/**
@@ -158,18 +156,28 @@ class Frontend {
 	public function post_where_next( $original ) {
 		global $post, $wpdb;
 
+		if ( ! $post instanceof \WP_Post ) {
+			return $original;
+		}
+
 		$ev_date = get_post_meta( $post->ID, CARTELLONE_META_SORT, true );
 		$ev_date = $ev_date ? (int) $ev_date : 0;
+		$title   = $post->post_title;
 
 		$season_year  = $this->settings->get_season_year( $ev_date );
 		$season_end   = $this->settings->get_season_start_timestamp( $season_year + 1 );
 
 		$sql = $wpdb->prepare(
-			"WHERE p.post_type = %s AND (p.post_status = 'publish' OR p.post_status = 'private') AND m.meta_key = %s AND m.meta_value > %d AND m.meta_value < %d",
+			"WHERE p.post_type = %s AND (p.post_status = 'publish' OR p.post_status = 'private') AND p.ID <> %d AND m.meta_key = %s AND CAST(m.meta_value AS UNSIGNED) < %d AND (CAST(m.meta_value AS UNSIGNED) > %d OR (CAST(m.meta_value AS UNSIGNED) = %d AND (p.post_title > %s OR (p.post_title = %s AND p.ID > %d))))",
 			CARTELLONE_CPT,
+			$post->ID,
 			CARTELLONE_META_SORT,
+			$season_end,
 			$ev_date,
-			$season_end
+			$ev_date,
+			$title,
+			$title,
+			$post->ID
 		);
 
 		return $sql;
@@ -184,18 +192,28 @@ class Frontend {
 	public function post_where_prev( $original ) {
 		global $post, $wpdb;
 
+		if ( ! $post instanceof \WP_Post ) {
+			return $original;
+		}
+
 		$ev_date = get_post_meta( $post->ID, CARTELLONE_META_SORT, true );
 		$ev_date = $ev_date ? (int) $ev_date : 0;
+		$title   = $post->post_title;
 
 		$season_year  = $this->settings->get_season_year( $ev_date );
 		$season_start = $this->settings->get_season_start_timestamp( $season_year );
 
 		$sql = $wpdb->prepare(
-			"WHERE p.post_type = %s AND (p.post_status = 'publish' OR p.post_status = 'private') AND m.meta_key = %s AND m.meta_value < %d AND m.meta_value > %d",
+			"WHERE p.post_type = %s AND (p.post_status = 'publish' OR p.post_status = 'private') AND p.ID <> %d AND m.meta_key = %s AND CAST(m.meta_value AS UNSIGNED) >= %d AND (CAST(m.meta_value AS UNSIGNED) < %d OR (CAST(m.meta_value AS UNSIGNED) = %d AND (p.post_title < %s OR (p.post_title = %s AND p.ID < %d))))",
 			CARTELLONE_CPT,
+			$post->ID,
 			CARTELLONE_META_SORT,
+			$season_start,
 			$ev_date,
-			$season_start
+			$ev_date,
+			$title,
+			$title,
+			$post->ID
 		);
 
 		return $sql;
