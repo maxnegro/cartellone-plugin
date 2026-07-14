@@ -22,6 +22,12 @@
 	font-size: 1em;
 }
 
+.nav-links::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
 .entry-content {
 	color: #333;
 	margin-bottom: 1em;

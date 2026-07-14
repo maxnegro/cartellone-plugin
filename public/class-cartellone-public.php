@@ -177,8 +177,9 @@ class Frontend {
 		$ev_date = get_post_meta( $post->ID, CARTELLONE_META_SORT, true );
 		$ev_date = $ev_date ? (int) $ev_date : 0;
 
-		$season_start = $this->settings->get_season_start_timestamp( (int) date( 'Y', $ev_date ) );
-		$season_end   = $this->settings->get_season_start_timestamp( (int) date( 'Y', $ev_date ) + 1 );
+		$season_year  = $this->settings->get_season_year( $ev_date );
+		$season_start = $this->settings->get_season_start_timestamp( $season_year );
+		$season_end   = $this->settings->get_season_start_timestamp( $season_year + 1 );
 
 		$sql = $wpdb->prepare(
 			"WHERE p.post_type = %s AND (p.post_status = 'publish' OR p.post_status = 'private') AND m.meta_key = %s AND m.meta_value > %d AND m.meta_value < %d " . $where,
@@ -219,7 +220,8 @@ class Frontend {
 		$ev_date = get_post_meta( $post->ID, CARTELLONE_META_SORT, true );
 		$ev_date = $ev_date ? (int) $ev_date : 0;
 
-		$season_start = $this->settings->get_season_start_timestamp( (int) date( 'Y', $ev_date ) );
+		$season_year  = $this->settings->get_season_year( $ev_date );
+		$season_start = $this->settings->get_season_start_timestamp( $season_year );
 
 		$sql = $wpdb->prepare(
 			"WHERE p.post_type = %s AND (p.post_status = 'publish' OR p.post_status = 'private') AND m.meta_key = %s AND m.meta_value < %d AND m.meta_value > %d " . $where,
