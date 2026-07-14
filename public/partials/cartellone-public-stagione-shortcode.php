@@ -48,6 +48,22 @@ $terms  = get_the_terms( get_the_ID(), CARTELLONE_TAX_TIPO );
 			}
 			?>
 		</div>
-		<?php require CARTELLONE_PATH . 'public/partials/cartellone-public-event-ticket.php'; ?>
+		<?php
+		if ( ! empty( $event['vivaticket'] ) && ! empty( $event['data'] ) && (int) $event['data'] >= time() && $evdata->season_open() ) {
+			if ( false !== strpos( $event['vivaticket'], 'eventbrite.it' ) ) {
+				printf(
+					'<a href="%s" target="_blank">%s</a>',
+					esc_url( $event['vivaticket'] ),
+					esc_html__( 'Free registration', 'cartellone' )
+				);
+			} else {
+				printf(
+					'<a href="%s" target="_blank">%s</a>',
+					esc_url( $event['vivaticket'] ),
+					esc_html__( 'Buy tickets', 'cartellone' )
+				);
+			}
+		}
+		?>
 	</div>
 </article>

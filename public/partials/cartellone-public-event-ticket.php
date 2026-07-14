@@ -16,15 +16,17 @@ if ( empty( $event['vivaticket'] ) || empty( $event['data'] ) || (int) $event['d
 	<?php
 	if ( false !== strpos( $event['vivaticket'], 'eventbrite.it' ) ) {
 		printf(
-			'<a href="%s" target="_blank" class="cartellone-event-ticket__link">%s</a>',
+			'<a href="%s" target="_blank"><img src="%s" alt="%s"></a>',
 			esc_url( $event['vivaticket'] ),
-			esc_html__( 'Free registration', 'cartellone' )
+			esc_url( CARTELLONE_URL . 'public/img/eventbrite.png' ),
+			esc_attr__( 'Free registration', 'cartellone' )
 		);
 	} else {
 		printf(
-			'<a href="%s" target="_blank" class="cartellone-event-ticket__link">%s</a>',
+			'<a href="%s" target="_blank"><img src="%s" alt="%s"></a>',
 			esc_url( $event['vivaticket'] ),
-			esc_html__( 'Buy tickets', 'cartellone' )
+			esc_url( CARTELLONE_URL . 'public/img/vivaticket.png' ),
+			esc_attr__( 'Buy tickets', 'cartellone' )
 		);
 	}
 	?>

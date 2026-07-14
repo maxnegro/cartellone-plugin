@@ -3,9 +3,10 @@
 /**
  * Renders plugin meta box.
  *
- * @var array $event Event data.
  * @var \Cartellone\Data $evdata Data instance.
  */
+
+$event = $evdata->get_data();
 ?>
 <table class="form-table">
 	<tr>

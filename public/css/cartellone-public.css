@@ -1,8 +1,32 @@
-/**
- * All of the CSS for your public-facing functionality should be
+/* All of the CSS for your public-facing functionality should be
  * included in this file.
  */
- .entry-content h1, .entry-content h2, .entry-content h3, .entry-content h4, .entry-content h5 {
+
+ .cartellone-single-event__thumbnail {
+    text-align: center;
+    margin: 1em 0;
+}
+
+.cartellone-single-event__thumbnail img {
+    max-width: 80%;
+    height: auto;
+}
+
+.lineup {
+    font-style: italic;
+    background-color: #f0f0f0;
+    padding: 1em;
+    width: 100%;
+    box-sizing: border-box;
+	margin-bottom: 1em;
+	font-size: 1em;
+}
+
+.entry-content {
+	color: #333;
+	margin-bottom: 1em;
+}
+.entry-content h1, .entry-content h2, .entry-content h3, .entry-content h4, .entry-content h5 {
     margin-top: 5px !important;
 }
 

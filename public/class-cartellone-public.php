@@ -56,6 +56,8 @@ class Frontend {
 		add_filter( 'get_previous_post_where', array( $this, 'post_where_prev' ) );
 
 		add_action( 'template_redirect', array( $this, 'maybe_redirect_old_season_url' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 	}
 
 	/**
