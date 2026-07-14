@@ -61,6 +61,8 @@ class Cartellone {
 		$this->i18n->run();
 		$this->admin->run();
 		$this->frontend->run();
+		add_filter( 'wp_import_post_meta', array( $this, 'normalize_imported_legacy_meta' ), 10, 3 );
+		add_action( 'import_post_meta', array( $this, 'migrate_imported_legacy_meta' ), 10, 3 );
 
 		add_action( 'init', array( $this, 'register_meta' ) );
 		add_action( 'init', array( $this, 'register_cpt' ) );
@@ -82,6 +84,81 @@ class Cartellone {
 			$query->set( 'meta_key', CARTELLONE_META_SORT );
 			$query->set( 'order', 'ASC' );
 		}
+	}
+
+	/**
+	 * Migrate legacy serialized meta during WordPress imports.
+	 *
+	 * @param int    $post_id Imported post ID.
+	 * @param string  $key Meta key.
+	 * @param mixed   $value Meta value.
+	 */
+	public function migrate_imported_legacy_meta( $post_id, $key, $value ) {
+		if ( CARTELLONE_META_DATA !== $key || CARTELLONE_CPT !== get_post_type( $post_id ) ) {
+			return;
+		}
+
+		Data::migrate_meta( $post_id );
+	}
+
+	/**
+	 * Normalize imported legacy meta before the importer stores it.
+	 *
+	 * @param array $post_metas Imported meta entries.
+	 * @param int   $post_id Imported post ID.
+	 * @param array $post Raw imported post data.
+	 * @return array
+	 */
+	public function normalize_imported_legacy_meta( $post_metas, $post_id, $post ) {
+		if ( CARTELLONE_CPT !== ( $post['post_type'] ?? '' ) || empty( $post_metas ) ) {
+			return $post_metas;
+		}
+
+		$normalized_metas = array();
+		$field_map        = array(
+			'ora'          => CARTELLONE_META_ORA,
+			'produzione'   => CARTELLONE_META_PRODUZIONE,
+			'protagonisti' => CARTELLONE_META_PROTAGONISTI,
+			'credits'      => CARTELLONE_META_CREDITS,
+			'vivaticket'   => CARTELLONE_META_VIVATICKET,
+		);
+
+		foreach ( $post_metas as $meta ) {
+			if ( CARTELLONE_META_DATA !== ( $meta['key'] ?? '' ) ) {
+				$normalized_metas[] = $meta;
+				continue;
+			}
+
+			$legacy = Data::normalize_legacy_meta( $meta['value'] ?? '' );
+
+			if ( ! empty( $legacy ) ) {
+				if ( isset( $legacy['data'] ) ) {
+					$normalized_metas[] = array(
+						'key'   => CARTELLONE_META_DATE,
+						'value' => (int) $legacy['data'],
+					);
+					$normalized_metas[] = array(
+						'key'   => CARTELLONE_META_SORT,
+						'value' => (int) $legacy['data'],
+					);
+				}
+
+				foreach ( $field_map as $field => $meta_key ) {
+					if ( ! isset( $legacy[ $field ] ) ) {
+						continue;
+					}
+
+					$normalized_metas[] = array(
+						'key'   => $meta_key,
+						'value' => $legacy[ $field ],
+					);
+				}
+			}
+
+			$normalized_metas[] = $meta;
+		}
+
+		return $normalized_metas;
 	}
 
 	/**

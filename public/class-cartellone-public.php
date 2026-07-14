@@ -158,31 +158,14 @@ class Frontend {
 	public function post_where_next( $original ) {
 		global $post, $wpdb;
 
-		$taxonomy = CARTELLONE_TAX_STAGIONE;
-		$where    = $wpdb->prepare( ' AND tt.taxonomy = %s', $taxonomy );
-
-		if ( ! is_object_in_taxonomy( $post->post_type, $taxonomy ) ) {
-			return $original;
-		}
-
-		$term_ids = wp_get_object_terms( $post->ID, $taxonomy, array( 'fields' => 'ids' ) );
-
-		if ( empty( $term_ids ) || is_wp_error( $term_ids ) ) {
-			return $original;
-		}
-
-		$term_ids = array_map( 'intval', $term_ids );
-		$where   .= ' AND tt.term_id IN (' . implode( ',', $term_ids ) . ')';
-
 		$ev_date = get_post_meta( $post->ID, CARTELLONE_META_SORT, true );
 		$ev_date = $ev_date ? (int) $ev_date : 0;
 
 		$season_year  = $this->settings->get_season_year( $ev_date );
-		$season_start = $this->settings->get_season_start_timestamp( $season_year );
 		$season_end   = $this->settings->get_season_start_timestamp( $season_year + 1 );
 
 		$sql = $wpdb->prepare(
-			"WHERE p.post_type = %s AND (p.post_status = 'publish' OR p.post_status = 'private') AND m.meta_key = %s AND m.meta_value > %d AND m.meta_value < %d " . $where,
+			"WHERE p.post_type = %s AND (p.post_status = 'publish' OR p.post_status = 'private') AND m.meta_key = %s AND m.meta_value > %d AND m.meta_value < %d",
 			CARTELLONE_CPT,
 			CARTELLONE_META_SORT,
 			$ev_date,
@@ -201,22 +184,6 @@ class Frontend {
 	public function post_where_prev( $original ) {
 		global $post, $wpdb;
 
-		$taxonomy = CARTELLONE_TAX_STAGIONE;
-		$where    = $wpdb->prepare( ' AND tt.taxonomy = %s', $taxonomy );
-
-		if ( ! is_object_in_taxonomy( $post->post_type, $taxonomy ) ) {
-			return $original;
-		}
-
-		$term_ids = wp_get_object_terms( $post->ID, $taxonomy, array( 'fields' => 'ids' ) );
-
-		if ( empty( $term_ids ) || is_wp_error( $term_ids ) ) {
-			return $original;
-		}
-
-		$term_ids = array_map( 'intval', $term_ids );
-		$where   .= ' AND tt.term_id IN (' . implode( ',', $term_ids ) . ')';
-
 		$ev_date = get_post_meta( $post->ID, CARTELLONE_META_SORT, true );
 		$ev_date = $ev_date ? (int) $ev_date : 0;
 
@@ -224,7 +191,7 @@ class Frontend {
 		$season_start = $this->settings->get_season_start_timestamp( $season_year );
 
 		$sql = $wpdb->prepare(
-			"WHERE p.post_type = %s AND (p.post_status = 'publish' OR p.post_status = 'private') AND m.meta_key = %s AND m.meta_value < %d AND m.meta_value > %d " . $where,
+			"WHERE p.post_type = %s AND (p.post_status = 'publish' OR p.post_status = 'private') AND m.meta_key = %s AND m.meta_value < %d AND m.meta_value > %d",
 			CARTELLONE_CPT,
 			CARTELLONE_META_SORT,
 			$ev_date,

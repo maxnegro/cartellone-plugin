@@ -52,7 +52,7 @@ class Data {
 			return false;
 		}
 
-		$legacy = get_post_meta( $this->post_id, CARTELLONE_META_DATA, true );
+		$legacy = self::normalize_legacy_meta( get_post_meta( $this->post_id, CARTELLONE_META_DATA, true ) );
 
 		if ( ! empty( $legacy ) && is_array( $legacy ) ) {
 			$this->event = $legacy;
@@ -245,7 +245,7 @@ class Data {
 	 * @param int $post_id Post ID.
 	 */
 	public static function migrate_meta( $post_id ) {
-		$legacy = get_post_meta( $post_id, CARTELLONE_META_DATA, true );
+		$legacy = self::normalize_legacy_meta( get_post_meta( $post_id, CARTELLONE_META_DATA, true ) );
 
 		if ( empty( $legacy ) || ! is_array( $legacy ) ) {
 			return;
@@ -275,5 +275,54 @@ class Data {
 		if ( isset( $legacy['vivaticket'] ) ) {
 			update_post_meta( $post_id, CARTELLONE_META_VIVATICKET, esc_url_raw( $legacy['vivaticket'] ) );
 		}
+	}
+
+	/**
+	 * Normalize legacy serialized meta imported from old exports.
+	 *
+	 * @param mixed $legacy Legacy value from post meta.
+	 * @return array
+	 */
+	public static function normalize_legacy_meta( $legacy ) {
+		if ( is_array( $legacy ) ) {
+			return $legacy;
+		}
+
+		if ( ! is_string( $legacy ) || '' === trim( $legacy ) ) {
+			return array();
+		}
+
+		$unserialized = maybe_unserialize( $legacy );
+		if ( is_array( $unserialized ) ) {
+			return $unserialized;
+		}
+
+		$parsed = array();
+
+		if ( preg_match( '/s:\\d+:"data";i:(\\d+);/s', $legacy, $matches ) ) {
+			$parsed['data'] = (int) $matches[1];
+		}
+
+		if ( preg_match( '/s:\\d+:"ora";s:\\d+:"(.*?)";s:\\d+:"produzione";/s', $legacy, $matches ) ) {
+			$parsed['ora'] = $matches[1];
+		}
+
+		if ( preg_match( '/s:\\d+:"produzione";s:\\d+:"(.*?)";s:\\d+:"protagonisti";/s', $legacy, $matches ) ) {
+			$parsed['produzione'] = $matches[1];
+		}
+
+		if ( preg_match( '/s:\\d+:"protagonisti";s:\\d+:"(.*?)";s:\\d+:"credits";/s', $legacy, $matches ) ) {
+			$parsed['protagonisti'] = $matches[1];
+		}
+
+		if ( preg_match( '/s:\\d+:"credits";s:\\d+:"(.*?)";s:\\d+:"vivaticket";/s', $legacy, $matches ) ) {
+			$parsed['credits'] = $matches[1];
+		}
+
+		if ( preg_match( '/s:\\d+:"vivaticket";s:\\d+:"(.*?)";\}/s', $legacy, $matches ) ) {
+			$parsed['vivaticket'] = $matches[1];
+		}
+
+		return $parsed;
 	}
 }
