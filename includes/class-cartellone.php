@@ -351,34 +351,8 @@ class Cartellone {
 			return 'off' !== sanitize_key( (string) $params['cartelloneOnlyFuture'] );
 		}
 
-		$admin_label = isset( $context['admin_label'] ) ? (string) $context['admin_label'] : '';
-		$loop_id     = isset( $context['loop_id'] ) ? (string) $context['loop_id'] : '';
-
-		$allow_admin_labels = apply_filters( 'cartellone_divi_future_guard_allow_admin_labels', array() );
-		$allow_loop_ids     = apply_filters( 'cartellone_divi_future_guard_allow_loop_ids', array() );
-		$deny_admin_labels  = apply_filters( 'cartellone_divi_future_guard_deny_admin_labels', array() );
-		$deny_loop_ids      = apply_filters( 'cartellone_divi_future_guard_deny_loop_ids', array() );
-
-		$allow_admin_labels = is_array( $allow_admin_labels ) ? array_map( 'strval', $allow_admin_labels ) : array();
-		$allow_loop_ids     = is_array( $allow_loop_ids ) ? array_map( 'strval', $allow_loop_ids ) : array();
-		$deny_admin_labels  = is_array( $deny_admin_labels ) ? array_map( 'strval', $deny_admin_labels ) : array();
-		$deny_loop_ids      = is_array( $deny_loop_ids ) ? array_map( 'strval', $deny_loop_ids ) : array();
-
-		$has_allowlist = ! empty( $allow_admin_labels ) || ! empty( $allow_loop_ids );
-		$enabled       = false;
-
-		if ( $has_allowlist ) {
-			$enabled = ( $admin_label && in_array( $admin_label, $allow_admin_labels, true ) )
-				|| ( $loop_id && in_array( $loop_id, $allow_loop_ids, true ) );
-		}
-
-		if ( $admin_label && in_array( $admin_label, $deny_admin_labels, true ) ) {
-			$enabled = false;
-		}
-
-		if ( $loop_id && in_array( $loop_id, $deny_loop_ids, true ) ) {
-			$enabled = false;
-		}
+		$data_loop = isset( $context['data_loop'] ) ? strtolower( trim( (string) $context['data_loop'] ) ) : '';
+		$enabled   = 'future' === $data_loop;
 
 		/**
 		 * Final override for enabling/disabling Divi future-date guard.
@@ -402,30 +376,65 @@ class Cartellone {
 	 */
 	private function build_divi_module_context( $loop_values = array(), $block_attrs = array(), $block = array() ) {
 		$context = array(
-			'admin_label' => '',
-			'loop_id'     => '',
-			'block_name'  => '',
+			'data_loop'   => '',
 		);
 
-		if ( is_array( $loop_values ) && isset( $loop_values['loopId'] ) ) {
-			$context['loop_id'] = (string) $loop_values['loopId'];
-		}
-
 		if ( is_array( $block_attrs ) ) {
-			if ( isset( $block_attrs['module']['meta']['adminLabel']['desktop']['value'] ) ) {
-				$context['admin_label'] = (string) $block_attrs['module']['meta']['adminLabel']['desktop']['value'];
+			$main_custom_attributes = $this->get_divi_module_main_custom_attributes( $block_attrs );
+			if ( isset( $main_custom_attributes['data-loop'] ) ) {
+				$context['data_loop'] = (string) $main_custom_attributes['data-loop'];
+			} elseif ( isset( $block_attrs['module']['advanced']['htmlAttributes']['desktop']['value']['data-loop'] ) ) {
+				$context['data_loop'] = (string) $block_attrs['module']['advanced']['htmlAttributes']['desktop']['value']['data-loop'];
 			}
-
-			if ( '' === $context['loop_id'] && isset( $block_attrs['module']['advanced']['loop']['desktop']['value']['loopId'] ) ) {
-				$context['loop_id'] = (string) $block_attrs['module']['advanced']['loop']['desktop']['value']['loopId'];
-			}
-		}
-
-		if ( is_array( $block ) && isset( $block['blockName'] ) ) {
-			$context['block_name'] = (string) $block['blockName'];
 		}
 
 		return $context;
+	}
+
+	/**
+	 * Extract main-target custom attributes from Divi module attrs.
+	 *
+	 * @param array $block_attrs Block attrs.
+	 * @return array
+	 */
+	private function get_divi_module_main_custom_attributes( $block_attrs ) {
+		$attributes = array();
+
+		if ( ! is_array( $block_attrs ) ) {
+			return $attributes;
+		}
+
+		$attributes_list = $block_attrs['module']['decoration']['attributes']['desktop']['value']['attributes'] ?? array();
+
+		if ( ! is_array( $attributes_list ) ) {
+			return $attributes;
+		}
+
+		foreach ( $attributes_list as $attribute ) {
+			if ( is_object( $attribute ) ) {
+				$attribute = (array) $attribute;
+			}
+
+			if ( ! is_array( $attribute ) ) {
+				continue;
+			}
+
+			$name           = isset( $attribute['name'] ) ? (string) $attribute['name'] : '';
+			$value          = isset( $attribute['value'] ) ? (string) $attribute['value'] : '';
+			$target_element = isset( $attribute['targetElement'] ) ? (string) $attribute['targetElement'] : '';
+
+			if ( '' === $name || '' === $value ) {
+				continue;
+			}
+
+			if ( '' !== $target_element && 'main' !== $target_element ) {
+				continue;
+			}
+
+			$attributes[ $name ] = $value;
+		}
+
+		return $attributes;
 	}
 
 	/**
