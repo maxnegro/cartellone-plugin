@@ -99,6 +99,7 @@ if ( file_exists( $autoload ) ) {
 	require_once CARTELLONE_PATH . 'includes/class-cartellone-i18n.php';
 	require_once CARTELLONE_PATH . 'includes/class-cartellone-activator.php';
 	require_once CARTELLONE_PATH . 'includes/class-cartellone-deactivator.php';
+	require_once CARTELLONE_PATH . 'includes/class-cartellone-divi-loop-hide.php';
 	require_once CARTELLONE_PATH . 'admin/class-cartellone-admin.php';
 	require_once CARTELLONE_PATH . 'public/class-cartellone-public.php';
 }

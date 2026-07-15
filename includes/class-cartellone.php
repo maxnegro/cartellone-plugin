@@ -76,6 +76,7 @@ class Cartellone {
 		add_filter( 'et_builder_loop_order_by_options_multiple_post_types', array( $this, 'extend_divi_loop_order_by_options_multiple_post_types' ), 10, 2 );
 		add_filter( 'divi_loop_data_after_execution', array( $this, 'filter_divi_loop_data_after_execution' ), 10, 3 );
 		add_filter( 'divi_module_options_loop_post_type_results_query_args', array( $this, 'filter_divi_loop_results_query_args' ), 10, 2 );
+		\Cartellone\Divi\LoopHide::register();
 	}
 
 	/**
