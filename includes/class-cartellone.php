@@ -78,6 +78,8 @@ class Cartellone {
 		add_filter( 'divi_loop_data_after_execution', array( $this, 'filter_divi_loop_data_after_execution' ), 10, 3 );
 		add_filter( 'divi_module_options_loop_post_type_results_query_args', array( $this, 'filter_divi_loop_results_query_args' ), 10, 2 );
 		\Cartellone\Divi\LoopHide::register();
+
+		add_action( 'cli_init', array( $this, 'register_cli_commands' ) );
 	}
 
 	/**
@@ -750,5 +752,16 @@ class Cartellone {
 	 */
 	public function data() {
 		return $this->data;
+	}
+
+	/**
+	 * Register WP-CLI commands.
+	 */
+	public function register_cli_commands() {
+		if ( ! class_exists( '\WP_CLI' ) ) {
+			return;
+		}
+
+		\WP_CLI::add_command( 'cartellone', \Cartellone\CLI\CartelloneCommand::class );
 	}
 }

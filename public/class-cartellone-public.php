@@ -260,6 +260,7 @@ class Frontend {
 				'post_type'      => CARTELLONE_CPT,
 				'post_status'    => 'publish',
 				'nopaging'       => true,
+				'suppress_filters' => true,
 				'tax_query'      => array(
 					array(
 						'taxonomy' => CARTELLONE_TAX_STAGIONE,
@@ -289,18 +290,42 @@ class Frontend {
 
 		$microdata = array();
 
-		while ( $query->have_posts() ) {
-			$query->the_post();
+		$previous_post = $GLOBALS['post'] ?? null;
+		$previous_query = $GLOBALS['wp_query'] ?? null;
 
-			$evdata = new Data( get_the_ID() );
+		$posts = $query->posts;
+
+		for ( $i = 0; $i < count( $posts ); $i++ ) {
+			$post = $posts[ $i ];
+
+			if ( $post->post_type !== CARTELLONE_CPT ) {
+				continue;
+			}
+
+			$evdata = new Data( $post->ID );
 			$ev     = $evdata->get_data();
+			$terms  = get_the_terms( $post->ID, CARTELLONE_TAX_TIPO );
 
 			$microdata[] = $evdata->get_microdata_json_array();
 
+			$GLOBALS['post'] = $post;
+			$GLOBALS['id'] = $post->ID;
+			setup_postdata( $post );
+
 			require CARTELLONE_PATH . 'public/partials/cartellone-public-stagione-shortcode.php';
+
+			wp_reset_postdata();
 		}
 
-		wp_reset_postdata();
+		if ( $previous_post instanceof \WP_Post ) {
+			$GLOBALS['post'] = $previous_post;
+			$GLOBALS['id'] = $previous_post->ID;
+			setup_postdata( $previous_post );
+		}
+
+		if ( $previous_query instanceof \WP_Query ) {
+			$GLOBALS['wp_query'] = $previous_query;
+		}
 
 		if ( ! empty( $microdata ) ) {
 			echo '<script type="application/ld+json">';
@@ -372,6 +397,7 @@ class Frontend {
 
 		$previous_post = $GLOBALS['post'] ?? null;
 		$GLOBALS['post'] = $post;
+		$GLOBALS['id'] = $post->ID;
 		setup_postdata( $post );
 
 		ob_start();
@@ -380,7 +406,10 @@ class Frontend {
 
 		?>
 		<div class="entry-content">
-			<?php the_content(); ?>
+			<?php
+			$content = get_post_field( 'post_content', $post_id );
+			echo apply_filters( 'the_content', $content );
+			?>
 		</div><!-- .entry-content -->
 		</article>
 		<?php
@@ -389,6 +418,7 @@ class Frontend {
 
 		if ( $previous_post instanceof \WP_Post ) {
 			$GLOBALS['post'] = $previous_post;
+			$GLOBALS['id'] = $previous_post->ID;
 			setup_postdata( $previous_post );
 		}
 

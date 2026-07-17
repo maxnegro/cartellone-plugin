@@ -27,12 +27,15 @@ if ( ! have_posts() ) {
 			$terms  = get_the_terms( get_the_ID(), CARTELLONE_TAX_TIPO );
 			?>
 
-		<?php require CARTELLONE_PATH . 'public/partials/cartellone-single-header.php'; ?>
+			<?php require CARTELLONE_PATH . 'public/partials/cartellone-single-header.php'; ?>
 
-		<div class="entry-content">
-			<?php the_content(); ?>
-		</div><!-- .entry-content -->
-	</article>
+			<div class="entry-content">
+				<?php
+				$content = get_post_field( 'post_content', get_the_ID() );
+				echo apply_filters( 'the_content', $content );
+				?>
+			</div><!-- .entry-content -->
+		</article>
 
 			<?php
 			$json_data = $evdata->get_microdata_json();

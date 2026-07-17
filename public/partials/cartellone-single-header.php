@@ -13,7 +13,7 @@ if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
 		return 'tipo-' . sanitize_html_class( $term->slug );
 	}, $terms ) );
 }
-$season_terms = get_the_terms( get_the_ID(), CARTELLONE_TAX_STAGIONE );
+$season_terms = get_the_terms( $post_id, CARTELLONE_TAX_STAGIONE );
 $season_class = '';
 if ( ! empty( $season_terms ) && ! is_wp_error( $season_terms ) ) {
 	$season_class = sanitize_html_class( 'stagione-' . $season_terms[0]->slug );
@@ -21,14 +21,14 @@ if ( ! empty( $season_terms ) && ! is_wp_error( $season_terms ) ) {
 $post_classes = 'border-bottom-hover ' . trim( $season_class . ' ' . $type_classes );
 ?>
 
-<article id="post-<?php the_ID(); ?>" <?php post_class( $post_classes ); ?>>
+<article id="post-<?php echo esc_attr( $post_id ); ?>" class="post-<?php echo esc_attr( $post_id ); ?> <?php echo esc_attr( $post_classes ); ?>">
 	<header class="entry-header">
 		<?php if ( ! empty( $event['produzione'] ) ) : ?>
 			<em><?php echo esc_html( $event['produzione'] ); ?></em>
 		<?php endif; ?>
 		<div class="entry-header-row">
 			<div class="entry-header-main">
-				<h1><?php the_title(); ?></h1>
+				<h1><?php echo esc_html( get_the_title( $post_id ) ); ?></h1>
 				<?php if ( ! empty( $event['protagonisti'] ) ) : ?>
 					<h2 class="entry-header"><?php echo esc_html( $event['protagonisti'] ); ?></h2>
 				<?php endif; ?>
@@ -46,20 +46,20 @@ $post_classes = 'border-bottom-hover ' . trim( $season_class . ' ' . $type_class
 		<div class="clearfix"></div>
 
 		<div class="post-img-wrap">
-			<?php if ( has_post_thumbnail() ) : ?>
-				<a href="<?php the_permalink(); ?>" title="<?php the_title_attribute(); ?>">
+			<?php if ( has_post_thumbnail( $post_id ) ) : ?>
+				<a href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" title="<?php echo esc_attr( get_the_title( $post_id ) ); ?>">
 					<?php
-					$full_src = wp_get_attachment_image_src( get_post_thumbnail_id(), 'cartellone-thumbnail' );
+					$full_src = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), 'cartellone-thumbnail' );
 					$full_src = $full_src ? $full_src[0] : '';
-					$thumb_src = wp_get_attachment_image_src( get_post_thumbnail_id(), 'thumbnail' );
+					$thumb_src = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), 'thumbnail' );
 					$thumb_src = $thumb_src ? $thumb_src[0] : '';
 					if ( $full_src && $thumb_src ) : ?>
 						<picture>
 							<source media="(max-width: 600px)" srcset="<?php echo esc_url( $thumb_src ); ?>">
-							<img decoding="async" style="width: 100%;" src="<?php echo esc_url( $full_src ); ?>" alt="<?php the_title_attribute(); ?>">
+							<img decoding="async" style="width: 100%;" src="<?php echo esc_url( $full_src ); ?>" alt="<?php echo esc_attr( get_the_title( $post_id ) ); ?>">
 						</picture>
 					<?php else : ?>
-						<?php the_post_thumbnail( 'cartellone-thumbnail', array( 'style' => 'width: 100%;' ) ); ?>
+						<?php echo get_the_post_thumbnail( $post_id, 'cartellone-thumbnail', array( 'style' => 'width: 100%;' ) ); ?>
 					<?php endif; ?>
 				</a>
 			<?php else : ?>
