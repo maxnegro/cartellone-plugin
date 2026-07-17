@@ -1,8 +1,12 @@
 <?php
 
-$evdata = new \Cartellone\Data( get_the_ID() );
-$event  = $evdata->get_data();
-$terms  = get_the_terms( get_the_ID(), CARTELLONE_TAX_TIPO );
+if ( ! isset( $event ) || ! isset( $terms ) ) {
+	$post_id = get_the_ID();
+	$evdata  = new \Cartellone\Data( $post_id );
+	$event   = $evdata->get_data();
+	$terms   = get_the_terms( $post_id, CARTELLONE_TAX_TIPO );
+}
+
 $type_classes = '';
 if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) {
 	$type_classes = implode( ' ', array_map( function( $term ) {
@@ -24,7 +28,7 @@ $post_classes = 'border-bottom-hover ' . trim( $season_class . ' ' . $type_class
 		<?php endif; ?>
 		<div class="entry-header-row">
 			<div class="entry-header-main">
-				<h1><a href="<?php the_permalink(); ?>" rel="bookmark"><?php the_title(); ?></a></h1>
+				<h1><?php the_title(); ?></h1>
 				<?php if ( ! empty( $event['protagonisti'] ) ) : ?>
 					<h2 class="entry-header"><?php echo esc_html( $event['protagonisti'] ); ?></h2>
 				<?php endif; ?>
@@ -69,21 +73,8 @@ $post_classes = 'border-bottom-hover ' . trim( $season_class . ' ' . $type_class
 				</div>
 			<?php endif; ?>
 		</div>
+
 		<?php require CARTELLONE_PATH . 'public/partials/cartellone-single-lineup-ticket.php'; ?>
 
 		<div class="clearfix"></div>
 	</header><!-- .entry-header -->
-
-	<div class="entry-content">
-		<?php
-		$ismore = strpos( get_the_content(), '<!--more-->' );
-		if ( $ismore ) {
-			the_content( '' );
-		} else {
-			the_excerpt();
-		}
-		?>
-
-		<a class="moretag" href="<?php the_permalink(); ?>"><span class="screen-reader-text"><?php printf( esc_html__( 'Leggi di piu a riguardo %s', 'cartellone' ), get_the_title() ); ?></span>[&hellip;]</a>
-	</div><!-- .entry-content -->
-</article>

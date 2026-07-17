@@ -47,6 +47,7 @@ class Frontend {
 	public function init() {
 		add_filter( 'single_template', array( $this, 'get_single_spettacoli_template' ) );
 		add_shortcode( 'stagione', array( $this, 'render_stagione_shortcode' ) );
+		add_shortcode( 'cartellone_single_event', array( $this, 'render_cartellone_single_event_shortcode' ) );
 
 		add_filter( 'get_next_post_join', array( $this, 'post_join' ) );
 		add_filter( 'get_previous_post_join', array( $this, 'post_join' ) );
@@ -340,5 +341,105 @@ class Frontend {
 			CARTELLONE_VERSION,
 			false
 		);
+	}
+
+	/**
+	 * Render cartellone single event shortcode.
+	 *
+	 * @param array $atts Shortcode attributes.
+	 * @return string
+	 */
+	public function render_cartellone_single_event_shortcode( $atts ) {
+		$atts = shortcode_atts(
+			array(
+				'id' => 0,
+			),
+			$atts,
+			'cartellone_single_event'
+		);
+
+		$post_id = ! empty( $atts['id'] ) ? (int) $atts['id'] : ( is_singular( CARTELLONE_CPT ) ? get_the_ID() : 0 );
+
+		if ( ! $post_id ) {
+			return '';
+		}
+
+		$post = get_post( $post_id );
+
+		if ( ! $post instanceof \WP_Post ) {
+			return '';
+		}
+
+		$previous_post = $GLOBALS['post'] ?? null;
+		$GLOBALS['post'] = $post;
+		setup_postdata( $post );
+
+		ob_start();
+
+		require CARTELLONE_PATH . 'public/partials/cartellone-single-header.php';
+
+		?>
+		<div class="entry-content">
+			<?php the_content(); ?>
+		</div><!-- .entry-content -->
+		</article>
+		<?php
+
+		wp_reset_postdata();
+
+		if ( $previous_post instanceof \WP_Post ) {
+			$GLOBALS['post'] = $previous_post;
+			setup_postdata( $previous_post );
+		}
+
+		return ob_get_clean();
+	}
+
+	/**
+	 * Inject event layout into the content for single spettacoli.
+	 *
+	 * @param string $content Post content.
+	 * @return string
+	 */
+	public function filter_single_event_content( $content ) {
+		if ( is_admin() || ! is_singular( CARTELLONE_CPT ) ) {
+			return $content;
+		}
+
+		if ( apply_filters( 'cartellone_skip_single_event_filter', false ) ) {
+			return $content;
+		}
+
+		if ( ! in_the_loop() && ! is_main_query() ) {
+			return $content;
+		}
+
+		static $done = false;
+
+		if ( $done ) {
+			return $content;
+		}
+
+		$done = true;
+
+		$post_id = get_the_ID();
+		$evdata  = new Data( $post_id );
+		$event   = $evdata->get_data();
+		$terms   = get_the_terms( $post_id, CARTELLONE_TAX_TIPO );
+
+		ob_start();
+
+		require CARTELLONE_PATH . 'public/partials/cartellone-single-header.php';
+
+		?>
+		<div class="entry-content">
+			<?php echo $content; ?>
+
+			<?php require CARTELLONE_PATH . 'public/partials/cartellone-public-event-ticket.php'; ?>
+		</div><!-- .entry-content -->
+		</article>
+		<?php
+
+		return ob_get_clean();
 	}
 }

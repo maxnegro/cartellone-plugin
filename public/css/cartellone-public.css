@@ -293,6 +293,18 @@ article.border-bottom-hover .cartellone-event-card__credits {
 	height: auto;
 }
 
+article.border-bottom-hover .lineup-ticket-wrapper {
+	display: flex !important;
+	justify-content: space-between !important;
+	align-items: center !important;
+	gap: 1em !important;
+	margin-bottom: 1em !important;
+}
+
+article.border-bottom-hover .lineup-ticket-wrapper .cartellone-event-ticket {
+	margin-top: 0 !important;
+}
+
 article.border-bottom-hover .lineup {
 	font-style: italic !important;
 	background-color: #f0f0f0 !important;
@@ -300,6 +312,7 @@ article.border-bottom-hover .lineup {
 	width: 100% !important;
 	box-sizing: border-box !important;
 	margin-top: 0 !important;
+	margin-bottom: 0 !important;
 	font-size: 1em !important;
 	border-radius: 0 !important;
 }
