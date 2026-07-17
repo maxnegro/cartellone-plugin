@@ -79,19 +79,18 @@ $post_classes = 'border-bottom-hover ' . trim( $season_class . ' ' . $type_class
 	<div class="entry-content">
 		<?php
 		$content = get_post_field( 'post_content', $post_id );
-		$ismore = false !== strpos( $content, '<!--more-->' );
+		$extended = get_extended( $content );
 
-		if ( $ismore ) {
-			echo apply_filters( 'the_content', $content );
+		if ( ! empty( $extended['extended'] ) ) {
+			echo apply_filters( 'the_content', $extended['main'] );
 		} else {
-			$excerpt = get_post_field( 'post_excerpt', $post_id );
+			$excerpt = get_the_excerpt( $post_id );
 			if ( empty( $excerpt ) ) {
 				$excerpt = wp_trim_words( $content, 55 );
 			}
 			echo apply_filters( 'the_excerpt', $excerpt );
 		}
+		echo '<a class="moretag" href="' . esc_url( get_permalink( $post_id ) ) . '"><span class="screen-reader-text">' . sprintf( esc_html__( 'Leggi di piu a riguardo %s', 'cartellone' ), get_the_title( $post_id ) ) . '</span>Leggi di più</a>';
 		?>
-
-		<a class="moretag" href="<?php echo esc_url( get_permalink( $post_id ) ); ?>"><span class="screen-reader-text"><?php printf( esc_html__( 'Leggi di piu a riguardo %s', 'cartellone' ), get_the_title( $post_id ) ); ?></span>[&hellip;]</a>
 	</div><!-- .entry-content -->
 </article>
