@@ -107,7 +107,7 @@ article.border-bottom-hover .entry-header em {
 article.border-bottom-hover .entry-header h2 {
 	font-size: 1.5em;
 	margin: 0 0 0.5em;
-	color: var(--cartellone-heading);
+	color: var(--cartellone-secondary);
 }
 
 article.border-bottom-hover .entry-header h2 a {
