@@ -68,6 +68,7 @@ class Cartellone {
 		add_action( 'init', array( $this, 'register_cpt' ) );
 		add_action( 'init', array( $this, 'register_taxonomy' ) );
 		add_action( 'init', array( $this, 'custom_rewrite_rule' ) );
+		add_action( 'after_setup_theme', array( $this, 'register_image_sizes' ) );
 		add_filter( 'post_type_link', array( $this, 'change_link' ), 10, 2 );
 		add_action( 'pre_get_posts', array( $this, 'pre_get_posts' ) );
 		add_filter( 'parse_query', array( $this, 'post_sort' ) );
@@ -709,6 +710,13 @@ class Cartellone {
 		);
 
 		register_taxonomy( CARTELLONE_TAX_TIPO, array( CARTELLONE_CPT ), $tipo_args );
+	}
+
+	/**
+	 * Register custom image sizes.
+	 */
+	public function register_image_sizes() {
+		add_image_size( 'cartellone-thumbnail', 1280, 720, true );
 	}
 
 	/**
