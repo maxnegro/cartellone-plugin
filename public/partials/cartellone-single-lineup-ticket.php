@@ -6,11 +6,11 @@ if ( empty( $event['credits'] ) && empty( $event['vivaticket'] ) ) {
 ?>
 
 <div class="lineup-ticket-wrapper">
-	<?php if ( ! empty( $event['credits'] ) ) : ?>
-		<div class="lineup">
+	<div class="lineup">
+		<?php if ( ! empty( $event['credits'] ) ) : ?>
 			<?php echo wp_kses_post( nl2br( $event['credits'] ) ); ?>
-		</div>
-	<?php endif; ?>
+		<?php endif; ?>
+	</div>
 
 	<?php if ( ! empty( $event['vivaticket'] ) && ! empty( $event['data'] ) 
 		// && (int) $event['data'] >= time() && $evdata->season_open() 
