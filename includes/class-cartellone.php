@@ -283,23 +283,25 @@ class Cartellone {
 			return $query_args;
 		}
 
-		if ( $this->is_divi_future_guard_enabled( $params, $context ) ) {
+		$guard = $this->is_divi_future_guard_enabled( $params, $context );
+
+		if ( 'future' === $guard || 'past' === $guard ) {
 			$today_start = strtotime( 'today', current_time( 'timestamp' ) );
 
-			$future_clause = array(
+			$clause = array(
 				'key'     => CARTELLONE_META_SORT,
 				'value'   => $today_start,
-				'compare' => '>=',
+				'compare' => 'future' === $guard ? '>=' : '<',
 				'type'    => 'NUMERIC',
 			);
 
 			if ( empty( $query_args['meta_query'] ) || ! is_array( $query_args['meta_query'] ) ) {
-				$query_args['meta_query'] = array( $future_clause );
+				$query_args['meta_query'] = array( $clause );
 			} else {
 				$query_args['meta_query'] = array(
 					'relation' => 'AND',
 					$query_args['meta_query'],
-					$future_clause,
+					$clause,
 				);
 			}
 		}
@@ -347,16 +349,17 @@ class Cartellone {
 			$params = array();
 		}
 
-		if ( isset( $params['cartellone_only_future'] ) ) {
-			return 'off' !== sanitize_key( (string) $params['cartellone_only_future'] );
-		}
-
-		if ( isset( $params['cartelloneOnlyFuture'] ) ) {
-			return 'off' !== sanitize_key( (string) $params['cartelloneOnlyFuture'] );
-		}
-
 		$data_loop = isset( $context['data_loop'] ) ? strtolower( trim( (string) $context['data_loop'] ) ) : '';
-		$enabled   = 'future' === $data_loop;
+
+		if ( 'future' === $data_loop ) {
+			return 'future';
+		}
+
+		if ( 'past' === $data_loop ) {
+			return 'past';
+		}
+
+		$enabled = false;
 
 		/**
 		 * Final override for enabling/disabling Divi future-date guard.
@@ -367,7 +370,7 @@ class Cartellone {
 		 */
 		$enabled = (bool) apply_filters( 'cartellone_divi_future_guard_enabled', $enabled, $context, $params );
 
-		return $enabled;
+		return $enabled ? 'future' : false;
 	}
 
 	/**
