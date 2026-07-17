@@ -20,72 +20,77 @@ if ( ! have_posts() ) {
 		while ( have_posts() ) :
 			the_post();
 
-			global $post;
-			$evdata = new \Cartellone\Data( $post->ID );
-			$ev     = $evdata->get_data();
-			$terms  = get_the_terms( $post->ID, CARTELLONE_TAX_TIPO );
+			$evdata = new \Cartellone\Data( get_the_ID() );
+			$event = $evdata->get_data();
+			$terms  = get_the_terms( get_the_ID(), CARTELLONE_TAX_TIPO );
 			?>
 
-			<article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-
-				<div class="container" style="margin-top: 15px;">
-					<div>
-						<strong><big><?php echo esc_html( date_i18n( 'l j F Y', (int) $ev['data'] ) ); ?></big></strong>
-						<?php if ( ! empty( $ev['ora'] ) ) : ?>
-							<?php printf( esc_html__( 'alle %s', 'cartellone' ), esc_html( $ev['ora'] ) ); ?>
-						<?php endif; ?>
-					</div>
-				</div>
-
-				<div class="container">
-					<div style="float:right; margin-top: 25px; margin-left: 1em;">
-						<?php if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) : ?>
-							<?php foreach ( $terms as $term ) : ?>
-								<span style="background-color: red; color: white; padding: 8px;"><?php echo esc_html( $term->name ); ?></span>
-							<?php endforeach; ?>
-						<?php endif; ?>
-					</div>
-
-					<?php if ( ! empty( $ev['produzione'] ) ) : ?>
-						<em><?php echo esc_html( $ev['produzione'] ); ?></em>
+			<article id="post-<?php the_ID(); ?>" <?php post_class( 'border-bottom-hover' ); ?>>
+				<header class="entry-header">
+					<?php if ( ! empty( $event['produzione'] ) ) : ?>
+						<em><?php echo esc_html( $event['produzione'] ); ?></em>
 					<?php endif; ?>
-					<h2><?php echo esc_html( $ev['protagonisti'] ?? '' ); ?></h2>
-					<h1 class="page-title"><?php the_title(); ?></h1>
-				</div>
+					<div class="entry-header-row">
+						<div class="entry-header-main">
+							<h1><?php the_title(); ?></h1>
+							<?php if ( ! empty( $event['protagonisti'] ) ) : ?>
+								<h2 class="entry-header"><?php echo esc_html( $event['protagonisti'] ); ?></h2>
+							<?php endif; ?>
+						</div>
+						<div class="entry-meta list-post-entry-meta">
+							<?php if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) : ?>
+								<?php foreach ( $terms as $term ) : ?>
+									<span class="post-comments"><?php echo esc_html( $term->name ); ?></span>
+								<?php endforeach; ?>
+							<?php endif; ?>
+						</div><!-- .entry-meta -->
+					</div>
 
-				<div class="container">
-					<?php if ( has_post_thumbnail() ) : ?>
-						<div class="cartellone-single-event__thumbnail">
-							<?php the_post_thumbnail( 'large' ); ?>
+					<div class="colored-line-left"></div>
+					<div class="clearfix"></div>
+
+					<div class="post-img-wrap">
+						<?php if ( has_post_thumbnail() ) : ?>
+							<a href="<?php the_permalink(); ?>" title="<?php the_title_attribute(); ?>">
+								<?php
+								$full_src = wp_get_attachment_image_src( get_post_thumbnail_id(), 'cartellone-thumbnail' );
+								$full_src = $full_src ? $full_src[0] : '';
+								$thumb_src = wp_get_attachment_image_src( get_post_thumbnail_id(), 'thumbnail' );
+								$thumb_src = $thumb_src ? $thumb_src[0] : '';
+								if ( $full_src && $thumb_src ) : ?>
+									<picture>
+										<source media="(max-width: 600px)" srcset="<?php echo esc_url( $thumb_src ); ?>">
+										<img decoding="async" style="width: 100%;" src="<?php echo esc_url( $full_src ); ?>" alt="<?php the_title_attribute(); ?>">
+									</picture>
+								<?php else : ?>
+									<?php the_post_thumbnail( 'cartellone-thumbnail', array( 'style' => 'width: 100%;' ) ); ?>
+								<?php endif; ?>
+							</a>
+						<?php else : ?>
+							<div class="post-img-placeholder"></div>
+						<?php endif; ?>
+						<?php if ( ! empty( $event['data'] ) ) : ?>
+							<div class="post-date">
+								<span class="post-date-day"><?php echo esc_html( date_i18n( 'd', (int) $event['data'] ) ); ?></span>
+								<span class="post-date-month"><?php echo esc_html( date_i18n( 'M', (int) $event['data'] ) ); ?></span>
+								<span class="post-date-year"><?php echo esc_html( date_i18n( 'Y', (int) $event['data'] ) ); ?></span>
+							</div>
+						<?php endif; ?>
+					</div>
+					<?php if ( ! empty( $event['credits'] ) ) : ?>
+						<div class="lineup">
+							<?php echo wp_kses_post( nl2br( $event['credits'] ) ); ?>
 						</div>
 					<?php endif; ?>
-				    <?php if ( ! empty( $ev['credits'] ?? '' ) ) : ?>
-						<h3 class="lineup"><?php echo wp_kses_post( nl2br( $ev['credits'] ?? '' ) ); ?></h3>
-					<?php endif; ?>
 
-					<div class="entry-content">
-						<?php the_content(); ?>
-					</div>
+					<div class="clearfix"></div>
+				</header><!-- .entry-header -->
+
+				<div class="entry-content">
+					<?php the_content(); ?>
 
 					<?php require CARTELLONE_PATH . 'public/partials/cartellone-public-event-ticket.php'; ?>
-
-					<?php
-					if ( is_singular( 'spettacoli' ) ) {
-						the_post_navigation(
-							array(
-								'next_text' => '<span class="meta-nav" aria-hidden="true">&nbsp;&raquo;</span> ' .
-									'<span class="screen-reader-text">' . esc_html__( 'Next post:', 'cartellone' ) . '</span> ' .
-									'<span class="post-title">%title</span>',
-								'prev_text' => '<span class="meta-nav" aria-hidden="true">&nbsp;&laquo;</span> ' .
-									'<span class="screen-reader-text">' . esc_html__( 'Previous post:', 'cartellone' ) . '</span> ' .
-									'<span class="post-title">%title</span>',
-								'screen_reader_text' => ' ',
-							)
-						);
-					}
-				?>
-				</div>
-
+				</div><!-- .entry-content -->
 			</article>
 
 			<?php
@@ -97,6 +102,22 @@ if ( ! have_posts() ) {
 				echo "</script>\n";
 			}
 			?>
+
+			<?php
+			if ( is_singular( 'spettacoli' ) ) {
+				the_post_navigation(
+					array(
+						'next_text' => '<span class="meta-nav" aria-hidden="true">&nbsp;&raquo;</span> ' .
+							'<span class="screen-reader-text">' . esc_html__( 'Next post:', 'cartellone' ) . '</span> ' .
+							'<span class="post-title">%title</span>',
+						'prev_text' => '<span class="meta-nav" aria-hidden="true">&nbsp;&laquo;</span> ' .
+							'<span class="screen-reader-text">' . esc_html__( 'Previous post:', 'cartellone' ) . '</span> ' .
+							'<span class="post-title">%title</span>',
+						'screen_reader_text' => ' ',
+					)
+				);
+			}
+		?>
 
 		<?php endwhile; ?>
 

@@ -257,15 +257,12 @@ article.border-bottom-hover .cartellone-event-card__credits {
 	margin-bottom: 1em !important;
 }
 
-article.border-bottom-hover .cartellone-event-card__excerpt {
-	margin-bottom: 1em !important;
-}
-
-article.border-bottom-hover .cartellone-event-ticket {
+.cartellone-event-ticket {
 	margin-top: 1em !important;
+	float: right !important;
 }
 
-article.border-bottom-hover .cartellone-event-ticket a {
+.cartellone-event-ticket a {
 	display: inline-block !important;
 	background-color: #007cba !important;
 	color: #fff !important;
@@ -274,9 +271,16 @@ article.border-bottom-hover .cartellone-event-ticket a {
 	border-radius: 3px !important;
 }
 
-article.border-bottom-hover .cartellone-event-ticket a:hover {
+.cartellone-event-ticket a:hover {
 	background-color: #005a87 !important;
 	text-decoration: none !important;
+}
+
+.cartellone-event-ticket img {
+	display: inline-block !important;
+	vertical-align: middle !important;
+	max-width: 100px !important;
+	height: auto !important;
 }
 
 .cartellone-single-event__thumbnail {

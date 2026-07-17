@@ -78,26 +78,6 @@ $post_classes = 'border-bottom-hover ' . trim( $season_class . ' ' . $type_class
 		<div class="clearfix"></div>
 	</header><!-- .entry-header -->
 
-	<?php
-	if ( ! empty( $event['vivaticket'] )
-		 && ! empty( $event['data'] ) && (int) $event['data'] >= time() && $evdata->season_open() 
-		) {
-		if ( false !== strpos( $event['vivaticket'], 'eventbrite.it' ) ) {
-			printf(
-				'<p><a href="%s" target="_blank">%s</a></p>',
-				esc_url( $event['vivaticket'] ),
-				esc_html__( 'Free registration', 'cartellone' )
-			);
-		} else {
-			printf(
-				'<p><a href="%s" target="_blank">%s</a></p>',
-				esc_url( $event['vivaticket'] ),
-				esc_html__( 'Buy tickets', 'cartellone' )
-			);
-		}
-	}
-	?>
-
 	<div class="entry-content">
 		<?php
 		$ismore = strpos( get_the_content(), '<!--more-->' );
@@ -107,6 +87,8 @@ $post_classes = 'border-bottom-hover ' . trim( $season_class . ' ' . $type_class
 			the_excerpt();
 		}
 		?>
+
+	<?php require CARTELLONE_PATH . 'public/partials/cartellone-public-event-ticket.php'; ?>
 
 		<a class="moretag" href="<?php the_permalink(); ?>"><span class="screen-reader-text"><?php printf( esc_html__( 'Leggi di piu a riguardo %s', 'cartellone' ), get_the_title() ); ?></span>[&hellip;]</a>
 	</div><!-- .entry-content -->
