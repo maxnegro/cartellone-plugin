@@ -12,7 +12,8 @@ article.border-bottom-hover {
 
 	border-bottom: 1px solid #eee;
 	padding-bottom: 2em;
-	margin-bottom: 2em;
+	margin-bottom: 1em;
+	margin-top: 1em;
 	box-sizing: border-box;
 	transition: border-color 0.3s ease;
 }
