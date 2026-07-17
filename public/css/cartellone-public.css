@@ -3,6 +3,13 @@
  */
 
 article.border-bottom-hover {
+	--cartellone-primary: var(--gcid-primary-color, #1a1a1a);
+	--cartellone-secondary: var(--gcid-secondary-color, #d0d92f);
+	--cartellone-heading: var(--gcid-heading-color, #666666);
+	--cartellone-body: var(--gcid-body-color, #333333);
+	--cartellone-white: var(--gcid-v3kjlrlwcf, #ffffff);
+	--cartellone-light: var(--gcid-j8lw41wxtb, #f9f9f9);
+
 	border-bottom: 1px solid #eee;
 	padding-bottom: 2em;
 	margin-bottom: 2em;
@@ -11,7 +18,7 @@ article.border-bottom-hover {
 }
 
 article.border-bottom-hover:hover {
-	border-bottom-color: #007cba;
+	border-bottom-color: var(--cartellone-secondary);
 }
 
 article.border-bottom-hover .post-img-wrap {
@@ -31,8 +38,8 @@ article.border-bottom-hover .post-date {
 	position: absolute;
 	top: 0;
 	left: 0;
-	background-color: #007cba;
-	color: #fff;
+	background-color: var(--cartellone-secondary);
+	color: var(--cartellone-white);
 	padding: 0.5em 0.8em;
 	text-align: center;
 	line-height: 1.2;
@@ -44,7 +51,7 @@ article.border-bottom-hover .post-date-day {
 	font-size: 31px;
 	line-height: 34px;
 	font-weight: 700;
-	color: #FFF;
+	color: var(--cartellone-white);
 }
 
 article.border-bottom-hover .post-date-month {
@@ -53,7 +60,7 @@ article.border-bottom-hover .post-date-month {
 	line-height: 24px;
 	font-weight: 500;
 	text-transform: uppercase;
-	color: #FFF;
+	color: var(--cartellone-white);
 }
 
 article.border-bottom-hover .post-date-year {
@@ -62,7 +69,7 @@ article.border-bottom-hover .post-date-year {
 	line-height: 24px;
 	font-weight: 700;
 	text-transform: uppercase;
-	color: #FFF;
+	color: var(--cartellone-white);
 }
 
 article.border-bottom-hover .entry-header {
@@ -93,17 +100,17 @@ article.border-bottom-hover .entry-header em {
 	font-style: italic;
 	display: block;
 	margin-bottom: 0.2em;
-	color: #666;
+	color: var(--cartellone-heading);
 }
 
 article.border-bottom-hover .entry-header h2 {
 	font-size: 1.5em;
 	margin: 0 0 0.5em;
-	color:#005a87;
+	color: var(--cartellone-heading);
 }
 
 article.border-bottom-hover .entry-header h2 a {
-	color: #007cba;
+	color: var(--cartellone-secondary);
 	text-decoration: none;
 }
 
@@ -113,7 +120,7 @@ article.border-bottom-hover .entry-header h2 a:hover {
 
 article.border-bottom-hover .colored-line-left {
 	height: 3px;
-	background-color: #007cba;
+	background-color: var(--cartellone-secondary);
 	width: 60px;
 	margin: 0.5em 0;
 }
@@ -127,7 +134,7 @@ article.border-bottom-hover .clearfix::after {
 article.border-bottom-hover .entry-meta {
 	margin: 0.5em 0;
 	font-size: 0.9em;
-	color: #666;
+	color: var(--cartellone-heading);
 }
 
 article.border-bottom-hover .list-post-entry-meta {
@@ -138,15 +145,15 @@ article.border-bottom-hover .list-post-entry-meta {
 }
 
 article.border-bottom-hover .post-comments {
-	background-color: #007cba;
-	color: #fff;
+	background-color: var(--cartellone-secondary);
+	color: var(--cartellone-white);
 	padding: 2px 8px;
 	font-size: 1em;
 	border-radius: 3px;
 }
 
 article.border-bottom-hover .entry-content {
-	color: #333;
+	color: var(--cartellone-body);
 	margin-bottom: 1em;
 }
 
@@ -157,7 +164,7 @@ article.border-bottom-hover .entry-content h1, article.border-bottom-hover .entr
 article.border-bottom-hover .moretag {
 	display: inline-block;
 	margin-top: 0.5em;
-	color: #007cba;
+	color: var(--cartellone-secondary);
 	text-decoration: none;
 }
 
@@ -189,7 +196,7 @@ article.border-bottom-hover .lineup-ticket-wrapper {
 	align-items: center;
 	gap: 1em;
 	margin-bottom: 2em;
-	background-color: #f0f0f0;
+	background-color: var(--cartellone-light);
 	padding: 1em;
 }
 
@@ -209,15 +216,15 @@ article.border-bottom-hover .lineup {
 
 article.border-bottom-hover .cartellone-event-ticket a {
 	display: inline-block;
-	background-color: #007cba;
-	color: #fff;
+	background-color: var(--cartellone-secondary);
+	color: var(--cartellone-white);
 	padding: 0.5em 1em;
 	text-decoration: none;
 	border-radius: 3px;
 }
 
 article.border-bottom-hover .cartellone-event-ticket a:hover {
-	background-color: #005a87;
+	background-color: var(--cartellone-primary);
 	text-decoration: none;
 }
 
