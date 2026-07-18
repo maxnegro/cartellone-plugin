@@ -532,14 +532,35 @@ class Cartellone {
 			'index.php?post_type=spettacoli&cartellone_ssn=$matches[1]&name=$matches[2]',
 			'top'
 		);
+	}
 
+	/**
+	 * Save (flush) the permalink structure when the config hash changed.
+	 *
+	 * Safe to call from init or settings save: rewrite rules are only
+	 * rebuilt when the relevant settings actually changed.
+	 */
+	public function flush_permalink_structure() {
 		$config_hash = $this->settings->get_config_hash();
 		$stored_hash = get_option( 'cartellone_config_hash' );
 
-		if ( empty( $stored_hash ) || $config_hash !== $stored_hash ) {
-			flush_rewrite_rules();
-			update_option( 'cartellone_config_hash', $config_hash, 'no' );
+		if ( $config_hash === $stored_hash ) {
+			return;
 		}
+
+		update_option( 'cartellone_config_hash', $config_hash, 'no' );
+
+		flush_rewrite_rules();
+	}
+
+	/**
+	 * Flush the permalink structure at plugin activation.
+	 *
+	 * Deferred to init so the plugin's CPT and rewrite rules are already
+	 * registered before the rules are rebuilt.
+	 */
+	public function flush_permalink_structure_on_activation() {
+		add_action( 'init', array( $this, 'flush_permalink_structure' ), 99 );
 	}
 
 	/**
@@ -775,7 +796,12 @@ class Cartellone {
 			$placeholder_id = $this->settings->get( 'placeholder_image_id' );
 
 			if ( $placeholder_id ) {
-				return $placeholder_id;
+				$attachment = get_post( $placeholder_id );
+				$file       = get_attached_file( $placeholder_id );
+
+				if ( $attachment && 'attachment' === $attachment->post_type && ! empty( $file ) && file_exists( $file ) ) {
+					return $placeholder_id;
+				}
 			}
 		}
 

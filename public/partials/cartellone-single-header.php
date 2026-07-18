@@ -63,7 +63,7 @@ $post_classes = 'border-bottom-hover ' . trim( $season_class . ' ' . $type_class
 					<?php endif; ?>
 				</a>
 			<?php else : ?>
-				<img src="<?php echo esc_url( apply_filters( 'cartellone_placeholder_image_url', CARTELLONE_URL . 'public/img/cartellone-plugin-placeholder.png' ) ); ?>" alt="<?php echo esc_attr( get_the_title( $post_id ) ); ?>" style="width: 100%; display: block;">
+				<div class="post-img-placeholder"></div>
 			<?php endif; ?>
 			<?php if ( ! empty( $event['data'] ) ) : ?>
 				<div class="post-date">

@@ -116,6 +116,10 @@ class Admin {
 				false
 			);
 		}
+
+		if ( 'spettacoli_page_cartellone' === $screen->id ) {
+			wp_enqueue_media();
+		}
 	}
 
 	/**

@@ -46,6 +46,28 @@ class Settings {
 	 */
 	public function run() {
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'update_option_' . $this->option_name, array( $this, 'flush_permalink_on_save' ), 10, 2 );
+	}
+
+	/**
+	 * Rebuild rewrite rules after settings are saved, if the permalink-relevant
+	 * values changed.
+	 *
+	 * @param mixed $old_value Previous option value.
+	 * @param mixed $new_value New option value.
+	 */
+	public function flush_permalink_on_save( $old_value, $new_value ) {
+		$relevant = array( 'season_start_day', 'season_start_month', 'shortcode_cache_ttl' );
+
+		foreach ( $relevant as $key ) {
+			$old = is_array( $old_value ) && isset( $old_value[ $key ] ) ? $old_value[ $key ] : '';
+			$new = is_array( $new_value ) && isset( $new_value[ $key ] ) ? $new_value[ $key ] : '';
+
+			if ( (string) $old !== (string) $new ) {
+				flush_rewrite_rules();
+				return;
+			}
+		}
 	}
 
 	/**
@@ -323,13 +345,18 @@ class Settings {
 		$image_id = $this->get( 'placeholder_image_id' );
 
 		if ( $image_id ) {
-			$placeholder_url = wp_get_attachment_image_url( $image_id, 'cartellone-thumbnail' );
-			if ( $placeholder_url ) {
-				return $placeholder_url;
+			$file = get_attached_file( $image_id );
+
+			if ( ! empty( $file ) && file_exists( $file ) ) {
+				$placeholder_url = wp_get_attachment_image_url( $image_id, 'cartellone-thumbnail' );
+
+				if ( $placeholder_url ) {
+					return $placeholder_url;
+				}
 			}
 		}
 
-		return $url ? $url : CARTELLONE_URL . 'public/img/cartellone-plugin-placeholder.png';
+		return CARTELLONE_URL . 'public/img/cartellone-plugin-placeholder.png';
 	}
 
 	/**

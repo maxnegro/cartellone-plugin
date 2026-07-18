@@ -35,6 +35,12 @@ article.border-bottom-hover .post-img-wrap img {
 	display: block;
 }
 
+article.border-bottom-hover .post-img-placeholder {
+	background-color: #e0e0e0 !important;
+	min-height: 200px !important;
+	width: 100% !important;
+}
+
 article.border-bottom-hover .post-date {
 	position: absolute;
 	top: 0;
