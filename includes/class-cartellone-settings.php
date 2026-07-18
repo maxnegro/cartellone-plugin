@@ -21,6 +21,7 @@ class Settings {
 		'shortcode_cache_ttl' => HOUR_IN_SECONDS,
 		'ticket_sale_start'  => '',
 		'placeholder_image_id' => '',
+		'placeholder_enabled' => '1',
 	);
 
 	/**
@@ -102,6 +103,14 @@ class Settings {
 		);
 
 		add_settings_field(
+			'placeholder_enabled',
+			__( 'Enable placeholder image', 'cartellone' ),
+			array( $this, 'render_placeholder_enabled_field' ),
+			'cartellone',
+			'cartellone_general'
+		);
+
+		add_settings_field(
 			'placeholder_image_id',
 			__( 'Placeholder image', 'cartellone' ),
 			array( $this, 'render_placeholder_image_field' ),
@@ -142,6 +151,10 @@ class Settings {
 
 		if ( isset( $input['placeholder_image_id'] ) ) {
 			$sanitized['placeholder_image_id'] = absint( $input['placeholder_image_id'] );
+		}
+
+		if ( isset( $input['placeholder_enabled'] ) ) {
+			$sanitized['placeholder_enabled'] = '1' === $input['placeholder_enabled'] ? '1' : '0';
 		}
 
 		return $sanitized;
@@ -205,6 +218,19 @@ class Settings {
 		$value = $this->get( 'ticket_sale_start' );
 		?>
 		<input type="date" name="cartellone_settings[ticket_sale_start]" value="<?php echo esc_attr( date( 'Y-m-d', $value ) ); ?>">
+		<?php
+	}
+
+	/**
+	 * Render placeholder enabled field.
+	 */
+	public function render_placeholder_enabled_field() {
+		$value = $this->get( 'placeholder_enabled' );
+		?>
+		<label>
+			<input type="checkbox" name="cartellone_settings[placeholder_enabled]" value="1" <?php checked( $value, '1' ); ?>>
+			<?php esc_html_e( 'Inject placeholder image for events without thumbnail', 'cartellone' ); ?>
+		</label>
 		<?php
 	}
 
@@ -290,19 +316,20 @@ class Settings {
 	/**
 	 * Get placeholder image URL.
 	 *
+	 * @param string $url Default placeholder URL.
 	 * @return string
 	 */
-	public function get_placeholder_image_url() {
+	public function get_placeholder_image_url( $url = '' ) {
 		$image_id = $this->get( 'placeholder_image_id' );
 
 		if ( $image_id ) {
-			$url = wp_get_attachment_image_url( $image_id, 'cartellone-thumbnail' );
-			if ( $url ) {
-				return $url;
+			$placeholder_url = wp_get_attachment_image_url( $image_id, 'cartellone-thumbnail' );
+			if ( $placeholder_url ) {
+				return $placeholder_url;
 			}
 		}
 
-		return CARTELLONE_URL . 'public/img/teatro-bibiena-placeholder.png';
+		return $url ? $url : CARTELLONE_URL . 'public/img/cartellone-plugin-placeholder.png';
 	}
 
 	/**

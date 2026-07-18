@@ -79,6 +79,8 @@ class Cartellone {
 		add_filter( 'divi_module_options_loop_post_type_results_query_args', array( $this, 'filter_divi_loop_results_query_args' ), 10, 2 );
 		\Cartellone\Divi\LoopHide::register();
 
+		add_filter( 'get_post_metadata', array( $this, 'inject_placeholder_thumbnail' ), 10, 4 );
+
 		add_filter( 'cartellone_placeholder_image_url', array( $this->settings(), 'get_placeholder_image_url' ) );
 
 		add_action( 'cli_init', array( $this, 'register_cli_commands' ) );
@@ -743,6 +745,41 @@ class Cartellone {
 		register_meta( 'post', CARTELLONE_META_PROTAGONISTI, $meta_args );
 		register_meta( 'post', CARTELLONE_META_CREDITS, $meta_args );
 		register_meta( 'post', CARTELLONE_META_VIVATICKET, $meta_args );
+	}
+
+	/**
+	 * Inject placeholder image as thumbnail for posts without one.
+	 */
+	public function inject_placeholder_thumbnail( $value, $post_id, $meta_key, $single ) {
+		if ( '_thumbnail_id' !== $meta_key || ! $single || get_post_type( $post_id ) !== CARTELLONE_CPT ) {
+			return $value;
+		}
+
+		if ( '1' !== $this->settings->get( 'placeholder_enabled', '1' ) ) {
+			return $value;
+		}
+
+		static $in_filter = false;
+
+		if ( $in_filter ) {
+			return $value;
+		}
+
+		$in_filter = true;
+
+		$real_thumbnail_id = get_post_meta( $post_id, '_thumbnail_id', true );
+
+		$in_filter = false;
+
+		if ( ! $real_thumbnail_id ) {
+			$placeholder_id = $this->settings->get( 'placeholder_image_id' );
+
+			if ( $placeholder_id ) {
+				return $placeholder_id;
+			}
+		}
+
+		return $value;
 	}
 
 	/**
