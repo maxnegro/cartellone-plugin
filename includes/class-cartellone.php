@@ -780,6 +780,10 @@ class Cartellone {
 			return $value;
 		}
 
+		if ( $this->is_admin_context() ) {
+			return $value;
+		}
+
 		static $in_filter = false;
 
 		if ( $in_filter ) {
@@ -806,6 +810,29 @@ class Cartellone {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Whether the current request is an admin/editing context where the
+	 * placeholder should NOT be injected (to avoid persisting it as the
+	 * post's real featured image).
+	 *
+	 * @return bool
+	 */
+	private function is_admin_context() {
+		if ( is_admin() || wp_doing_ajax() ) {
+			return true;
+		}
+
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			$context = isset( $_GET['context'] ) ? sanitize_key( $_GET['context'] ) : '';
+
+			if ( 'edit' === $context ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
