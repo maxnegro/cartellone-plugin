@@ -29,10 +29,10 @@ article.border-bottom-hover .post-img-wrap {
 	overflow: hidden;
 }
 
-article.border-bottom-hover .post-img-placeholder {
-	background-color: #e0e0e0;
-	min-height: 200px;
+article.border-bottom-hover .post-img-wrap img {
 	width: 100%;
+	height: auto;
+	display: block;
 }
 
 article.border-bottom-hover .post-date {

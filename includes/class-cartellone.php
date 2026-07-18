@@ -79,6 +79,8 @@ class Cartellone {
 		add_filter( 'divi_module_options_loop_post_type_results_query_args', array( $this, 'filter_divi_loop_results_query_args' ), 10, 2 );
 		\Cartellone\Divi\LoopHide::register();
 
+		add_filter( 'cartellone_placeholder_image_url', array( $this->settings(), 'get_placeholder_image_url' ) );
+
 		add_action( 'cli_init', array( $this, 'register_cli_commands' ) );
 	}
 

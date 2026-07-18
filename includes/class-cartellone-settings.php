@@ -20,6 +20,7 @@ class Settings {
 		'season_start_month' => '09',
 		'shortcode_cache_ttl' => HOUR_IN_SECONDS,
 		'ticket_sale_start'  => '',
+		'placeholder_image_id' => '',
 	);
 
 	/**
@@ -99,6 +100,14 @@ class Settings {
 			'cartellone',
 			'cartellone_general'
 		);
+
+		add_settings_field(
+			'placeholder_image_id',
+			__( 'Placeholder image', 'cartellone' ),
+			array( $this, 'render_placeholder_image_field' ),
+			'cartellone',
+			'cartellone_general'
+		);
 	}
 
 	/**
@@ -129,6 +138,10 @@ class Settings {
 			} else {
 				$sanitized['ticket_sale_start'] = $this->get( 'ticket_sale_start', mktime( 0, 0, 0, 11, 2, 2022 ) );
 			}
+		}
+
+		if ( isset( $input['placeholder_image_id'] ) ) {
+			$sanitized['placeholder_image_id'] = absint( $input['placeholder_image_id'] );
 		}
 
 		return $sanitized;
@@ -196,6 +209,52 @@ class Settings {
 	}
 
 	/**
+	 * Render placeholder image field.
+	 */
+	public function render_placeholder_image_field() {
+		$image_id = $this->get( 'placeholder_image_id' );
+		$image_url = $image_id ? wp_get_attachment_image_url( $image_id, 'medium' ) : '';
+		?>
+		<div class="cartellone-placeholder-image-field">
+			<img id="cartellone-placeholder-preview" src="<?php echo esc_url( $image_url ); ?>" style="max-width: 200px; display: <?php echo $image_url ? 'block' : 'none'; ?>;">
+			<input type="hidden" name="cartellone_settings[placeholder_image_id]" id="cartellone-placeholder-id" value="<?php echo esc_attr( $image_id ); ?>">
+			<button type="button" class="button" id="cartellone-placeholder-select"><?php esc_html_e( 'Select image', 'cartellone' ); ?></button>
+			<button type="button" class="button" id="cartellone-placeholder-clear" style="<?php echo $image_id ? '' : 'display:none;'; ?>"><?php esc_html_e( 'Clear', 'cartellone' ); ?></button>
+		</div>
+		<script>
+		jQuery(document).ready(function($) {
+			var frame;
+			$('#cartellone-placeholder-select').on('click', function(e) {
+				e.preventDefault();
+				if (frame) {
+					frame.open();
+					return;
+				}
+				frame = wp.media({
+					title: '<?php esc_html_e( 'Select placeholder image', 'cartellone' ); ?>',
+					library: { type: 'image' },
+					button: { text: '<?php esc_html_e( 'Use this image', 'cartellone' ); ?>' }
+				});
+				frame.on('select', function() {
+					var attachment = frame.state().get('selection').first().toJSON();
+					$('#cartellone-placeholder-id').val(attachment.id);
+					$('#cartellone-placeholder-preview').attr('src', attachment.sizes.medium ? attachment.sizes.medium.url : attachment.url).show();
+					$('#cartellone-placeholder-clear').show();
+				});
+				frame.open();
+			});
+			$('#cartellone-placeholder-clear').on('click', function(e) {
+				e.preventDefault();
+				$('#cartellone-placeholder-id').val('');
+				$('#cartellone-placeholder-preview').hide();
+				$(this).hide();
+			});
+		});
+		</script>
+		<?php
+	}
+
+	/**
 	 * Get settings.
 	 *
 	 * @return array
@@ -226,6 +285,24 @@ class Settings {
 		}
 
 		return $default;
+	}
+
+	/**
+	 * Get placeholder image URL.
+	 *
+	 * @return string
+	 */
+	public function get_placeholder_image_url() {
+		$image_id = $this->get( 'placeholder_image_id' );
+
+		if ( $image_id ) {
+			$url = wp_get_attachment_image_url( $image_id, 'cartellone-thumbnail' );
+			if ( $url ) {
+				return $url;
+			}
+		}
+
+		return CARTELLONE_URL . 'public/img/teatro-bibiena-placeholder.png';
 	}
 
 	/**

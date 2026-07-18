@@ -13,7 +13,7 @@ if ( empty( $event['credits'] ) && empty( $event['vivaticket'] ) ) {
 	</div>
 
 	<?php if ( ! empty( $event['vivaticket'] ) && ! empty( $event['data'] ) 
-		// && (int) $event['data'] >= time() && $evdata->season_open() 
+		&& (int) $event['data'] >= time() && $evdata->season_open() 
 	) : ?>
 		<div class="cartellone-event-ticket">
 			<?php
