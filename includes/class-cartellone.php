@@ -80,6 +80,9 @@ class Cartellone {
 		\Cartellone\Divi\LoopHide::register();
 
 		add_filter( 'get_post_metadata', array( $this, 'inject_placeholder_thumbnail' ), 10, 4 );
+		add_action( 'save_post', array( $this, 'prevent_placeholder_as_thumbnail' ), 10, 3 );
+		add_filter( 'update_post_metadata', array( $this, 'block_placeholder_metadata' ), 10, 4 );
+		add_filter( 'add_post_metadata', array( $this, 'block_placeholder_metadata' ), 10, 4 );
 
 		add_filter( 'cartellone_placeholder_image_url', array( $this->settings(), 'get_placeholder_image_url' ) );
 
@@ -825,6 +828,16 @@ class Cartellone {
 		}
 
 		if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+			// The block editor reads/writes posts and media through the core
+			// wp/v2 REST namespace. The placeholder must not be injected there
+			// (otherwise it leaks into the editor after saving). The Divi loop
+			// uses the separate divi/v1 namespace and is left untouched.
+			$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '';
+
+			if ( false !== strpos( $request_uri, '/wp-json/wp/v2/' ) ) {
+				return true;
+			}
+
 			$context = isset( $_GET['context'] ) ? sanitize_key( $_GET['context'] ) : '';
 
 			if ( 'edit' === $context ) {
@@ -833,6 +846,74 @@ class Cartellone {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Block the placeholder image from being written as a spettacolo's real
+	 * featured image metadata.
+	 *
+	 * The placeholder is only injected on public views; persisting it as the
+	 * post's actual thumbnail would make it permanent and break the
+	 * "no thumbnail" state. Returning a non-null value short-circuits the
+	 * metadata write so the placeholder id is never stored.
+	 *
+	 * @param null|bool $check Whether to short-circuit.
+	 * @param int       $object_id Object ID.
+	 * @param string    $meta_key Meta key.
+	 * @param mixed     $meta_value Meta value.
+	 * @return null|bool
+	 */
+	public function block_placeholder_metadata( $check, $object_id, $meta_key, $meta_value ) {
+		if ( '_thumbnail_id' !== $meta_key ) {
+			return $check;
+		}
+
+		if ( CARTELLONE_CPT !== get_post_type( $object_id ) ) {
+			return $check;
+		}
+
+		$placeholder_id = $this->settings->get( 'placeholder_image_id' );
+
+		if ( ! $placeholder_id ) {
+			return $check;
+		}
+
+		if ( (int) $meta_value === (int) $placeholder_id ) {
+			return false;
+		}
+
+		return $check;
+	}
+
+	/**
+	 * Prevent the placeholder image from being persisted as a spettacolo's
+	 * real featured image on save (fallback for paths that write the meta
+	 * directly instead of through the metadata API).
+	 *
+	 * @param int     $post_id Post ID.
+	 * @param \WP_Post $post Post object.
+	 * @param bool    $update Whether this is an update.
+	 */
+	public function prevent_placeholder_as_thumbnail( $post_id, $post, $update ) {
+		if ( CARTELLONE_CPT !== $post->post_type ) {
+			return;
+		}
+
+		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
+			return;
+		}
+
+		$placeholder_id = $this->settings->get( 'placeholder_image_id' );
+
+		if ( ! $placeholder_id ) {
+			return;
+		}
+
+		$stored = get_post_meta( $post_id, '_thumbnail_id', true );
+
+		if ( (int) $stored === (int) $placeholder_id ) {
+			delete_post_meta( $post_id, '_thumbnail_id' );
+		}
 	}
 
 	/**
