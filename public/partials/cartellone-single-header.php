@@ -56,7 +56,7 @@ $post_classes = 'border-bottom-hover ' . trim( $season_class . ' ' . $type_class
 					if ( $full_src && $thumb_src ) : ?>
 						<picture>
 							<source media="(max-width: 600px)" srcset="<?php echo esc_url( $thumb_src ); ?>">
-							<img decoding="async" style="width: 100%;" src="<?php echo esc_url( $full_src ); ?>" alt="<?php echo esc_attr( get_the_title( $post_id ) ); ?>">
+							<img decoding="async" src="<?php echo esc_url( $full_src ); ?>" alt="<?php echo esc_attr( get_the_title( $post_id ) ); ?>">
 						</picture>
 					<?php else : ?>
 						<?php echo get_the_post_thumbnail( $post_id, 'cartellone-thumbnail', array( 'style' => 'width: 100%;' ) ); ?>

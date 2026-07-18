@@ -27,6 +27,11 @@ article.border-bottom-hover .post-img-wrap {
 	display: block;
 	margin-bottom: 0;
 	overflow: hidden;
+	text-align: center;
+}
+
+article.border-bottom-hover picture {
+	display: inline-block;
 }
 
 article.border-bottom-hover .post-img-wrap img {
