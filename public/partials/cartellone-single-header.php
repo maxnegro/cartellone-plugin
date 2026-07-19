@@ -25,7 +25,7 @@ $post_classes = 'border-bottom-hover ' . trim( $season_class . ' ' . $type_class
 	<header class="entry-header">
 		<?php if ( ! empty( $event['data'] ) ) : ?>
 		<div class="cartellone-event-data-ora">
-			<strong><?php echo esc_attr( date_i18n( 'l d F Y', (int) $event['data'] ) ); ?></strong>
+			<strong><?php echo esc_attr( date_i18n( 'l j F Y', (int) $event['data'] ) ); ?></strong>
 			<?php if (! empty( $event['ora'] ) ) : ?>
 				alle <?php echo esc_attr( $event['ora'] ); ?>
 			<?php endif; ?>
