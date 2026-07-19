@@ -97,6 +97,7 @@ article.border-bottom-hover .entry-header-main {
 
 article.border-bottom-hover .entry-header-main h1 {
 	margin: 0 0 0.2em;
+	padding-bottom: 0;
 }
 
 article.border-bottom-hover .entry-header-main h2 {
