@@ -23,6 +23,14 @@ $post_classes = 'border-bottom-hover ' . trim( $season_class . ' ' . $type_class
 
 <article id="post-<?php echo esc_attr( $post_id ); ?>" class="post-<?php echo esc_attr( $post_id ); ?> <?php echo esc_attr( $post_classes ); ?>">
 	<header class="entry-header">
+		<?php if ( ! empty( $event['data'] ) ) : ?>
+		<div class="cartellone-event-data-ora">
+			<strong><?php echo esc_attr( date_i18n( 'l d F Y', (int) $event['data'] ) ); ?></strong>
+			<?php if (! empty( $event['ora'] ) ) : ?>
+				alle <?php echo esc_attr( $event['ora'] ); ?>
+			<?php endif; ?>
+		</div>
+		<?php endif; ?>
 		<?php if ( ! empty( $event['produzione'] ) ) : ?>
 			<em><?php echo esc_html( $event['produzione'] ); ?></em>
 		<?php endif; ?>

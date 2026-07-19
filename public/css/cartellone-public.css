@@ -242,6 +242,12 @@ article.border-bottom-hover .cartellone-event-ticket img {
 	height: auto;
 }
 
+article.border-bottom-hover .cartellone-event-data-ora {
+	margin-bottom: 0.5em;
+	color: var(--cartellone-heading);
+	font-size: 1.2em;
+}
+
 .cartellone-single-event__thumbnail {
 	text-align: center;
 	margin: 1em 0;
