@@ -83,6 +83,7 @@ class Cartellone {
 		add_action( 'save_post', array( $this, 'prevent_placeholder_as_thumbnail' ), 10, 3 );
 		add_filter( 'update_post_metadata', array( $this, 'block_placeholder_metadata' ), 10, 4 );
 		add_filter( 'add_post_metadata', array( $this, 'block_placeholder_metadata' ), 10, 4 );
+		add_filter( 'wp_calculate_image_srcset', array( $this, 'filter_cartellone_srcset' ), 20, 5 );
 
 		add_filter( 'cartellone_placeholder_image_url', array( $this->settings(), 'get_placeholder_image_url' ) );
 
@@ -914,6 +915,128 @@ class Cartellone {
 		if ( (int) $stored === (int) $placeholder_id ) {
 			delete_post_meta( $post_id, '_thumbnail_id' );
 		}
+	}
+
+	/**
+	 * Filter srcset for cartellone-thumbnail to keep only 16:9 sizes.
+	 *
+	 * @param array  $sources       Array of image sources.
+	 * @param int[]  $size_array    Requested width and height.
+	 * @param string $image_src     The src of the image.
+	 * @param array  $image_meta    The image meta data.
+	 * @param int    $attachment_id The attachment ID.
+	 * @return array
+	 */
+	public function filter_cartellone_srcset( $sources, $size_array, $image_src, $image_meta, $attachment_id ) {
+		$cartellone_src = wp_get_attachment_image_url( $attachment_id, 'cartellone-thumbnail' );
+
+		if ( ! $cartellone_src || $cartellone_src !== $image_src ) {
+			return $sources;
+		}
+
+		$filtered = array();
+
+		if ( ! empty( $sources ) && is_array( $sources ) ) {
+			foreach ( $sources as $source ) {
+				if ( ! is_array( $source ) || empty( $source['url'] ) ) {
+					continue;
+				}
+
+				$entry_url = $source['url'];
+				$matched_ratio = null;
+				$matched_name = '';
+
+				if ( ! empty( $image_meta['sizes'] ) && is_array( $image_meta['sizes'] ) ) {
+					$entry_basename = basename( $entry_url );
+
+					foreach ( $image_meta['sizes'] as $size_name => $size_data ) {
+						if ( ! is_array( $size_data ) ) {
+							continue;
+						}
+
+						$size_file = isset( $size_data['file'] ) ? (string) $size_data['file'] : '';
+						if ( ! $size_file ) {
+							continue;
+						}
+
+						if ( basename( $size_file ) !== $entry_basename ) {
+							continue;
+						}
+
+						$width  = isset( $size_data['width'] ) ? (int) $size_data['width'] : 0;
+						$height = isset( $size_data['height'] ) ? (int) $size_data['height'] : 0;
+
+						if ( $width > 0 && $height > 0 ) {
+							$matched_ratio = $width / $height;
+							$matched_name = $size_name;
+						}
+
+						break;
+					}
+				}
+
+				if ( null === $matched_ratio ) {
+					$upload_dir = wp_upload_dir();
+					$file_path = str_replace( $upload_dir['baseurl'], $upload_dir['basedir'], $entry_url );
+
+					if ( $file_path !== $entry_url && file_exists( $file_path ) ) {
+						$image_size = getimagesize( $file_path );
+
+						if ( $image_size && isset( $image_size[0], $image_size[1] ) && $image_size[0] > 0 && $image_size[1] > 0 ) {
+							$matched_ratio = $image_size[0] / $image_size[1];
+						}
+					}
+				}
+
+				if ( null === $matched_ratio ) {
+					$filtered[] = $source;
+					continue;
+				}
+
+				if ( 'cartellone-thumbnail' === $matched_name || $this->is_sixteen_by_nine( $matched_ratio ) ) {
+					$filtered[] = $source;
+				}
+			}
+		}
+
+		$has_cartellone = false;
+		foreach ( $filtered as $source ) {
+			if ( isset( $source['url'] ) && $source['url'] === $cartellone_src ) {
+				$has_cartellone = true;
+				break;
+			}
+		}
+
+		if ( ! $has_cartellone ) {
+			$cartellone_src_data = wp_get_attachment_image_src( $attachment_id, 'cartellone-thumbnail' );
+
+			if ( $cartellone_src_data && isset( $cartellone_src_data[0], $cartellone_src_data[1] ) ) {
+				$filtered[] = array(
+					'url'        => $cartellone_src_data[0],
+					'descriptor' => 'w',
+					'value'      => $cartellone_src_data[1],
+				);
+			}
+		}
+
+		if ( empty( $filtered ) ) {
+			return $sources;
+		}
+
+		return $filtered;
+	}
+
+	/**
+	 * Check if an aspect ratio is approximately 16:9.
+	 *
+	 * @param float $ratio Aspect ratio.
+	 * @param float $tolerance Tolerance.
+	 * @return bool
+	 */
+	private function is_sixteen_by_nine( $ratio, $tolerance = 0.15 ) {
+		$target = 16 / 9;
+
+		return abs( $ratio - $target ) < $tolerance;
 	}
 
 	/**
