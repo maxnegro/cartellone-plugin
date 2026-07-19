@@ -121,6 +121,12 @@ class Frontend {
 	 * @return string
 	 */
 	public function post_join( $join ) {
+		global $post;
+
+		if ( ! $post instanceof \WP_Post || CARTELLONE_CPT !== $post->post_type ) {
+			return $join;
+		}
+
 		global $wpdb;
 
 		$join .= " INNER JOIN {$wpdb->postmeta} AS m ON p.ID = m.post_id";
@@ -135,6 +141,12 @@ class Frontend {
 	 * @return string
 	 */
 	public function post_sort_next( $orderby ) {
+		global $post;
+
+		if ( ! $post instanceof \WP_Post || CARTELLONE_CPT !== $post->post_type ) {
+			return $orderby;
+		}
+
 		return 'ORDER BY CAST(m.meta_value AS UNSIGNED) ASC, p.post_title ASC, p.ID ASC LIMIT 1';
 	}
 
@@ -145,6 +157,12 @@ class Frontend {
 	 * @return string
 	 */
 	public function post_sort_prev( $orderby ) {
+		global $post;
+
+		if ( ! $post instanceof \WP_Post || CARTELLONE_CPT !== $post->post_type ) {
+			return $orderby;
+		}
+
 		return 'ORDER BY CAST(m.meta_value AS UNSIGNED) DESC, p.post_title DESC, p.ID DESC LIMIT 1';
 	}
 
@@ -157,7 +175,7 @@ class Frontend {
 	public function post_where_next( $original ) {
 		global $post, $wpdb;
 
-		if ( ! $post instanceof \WP_Post ) {
+		if ( ! $post instanceof \WP_Post || CARTELLONE_CPT !== $post->post_type ) {
 			return $original;
 		}
 
@@ -193,7 +211,7 @@ class Frontend {
 	public function post_where_prev( $original ) {
 		global $post, $wpdb;
 
-		if ( ! $post instanceof \WP_Post ) {
+		if ( ! $post instanceof \WP_Post || CARTELLONE_CPT !== $post->post_type ) {
 			return $original;
 		}
 
