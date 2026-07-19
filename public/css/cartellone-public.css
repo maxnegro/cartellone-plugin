@@ -30,14 +30,9 @@ article.border-bottom-hover .post-img-wrap {
 	text-align: center;
 }
 
-article.border-bottom-hover picture {
-	display: inline-block;
-}
-
 article.border-bottom-hover .post-img-wrap img {
-	width: 100%;
-	height: auto;
-	display: block;
+	display: inline-block;
+	max-width: 100%;
 }
 
 article.border-bottom-hover .post-img-placeholder {

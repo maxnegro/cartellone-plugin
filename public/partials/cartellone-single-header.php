@@ -48,19 +48,7 @@ $post_classes = 'border-bottom-hover ' . trim( $season_class . ' ' . $type_class
 		<div class="post-img-wrap">
 			<?php if ( has_post_thumbnail( $post_id ) ) : ?>
 				<a href="<?php echo esc_url( get_permalink( $post_id ) ); ?>" title="<?php echo esc_attr( get_the_title( $post_id ) ); ?>">
-					<?php
-					$full_src = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), 'cartellone-thumbnail' );
-					$full_src = $full_src ? $full_src[0] : '';
-					$thumb_src = wp_get_attachment_image_src( get_post_thumbnail_id( $post_id ), 'thumbnail' );
-					$thumb_src = $thumb_src ? $thumb_src[0] : '';
-					if ( $full_src && $thumb_src ) : ?>
-						<picture>
-							<source media="(max-width: 600px)" srcset="<?php echo esc_url( $thumb_src ); ?>">
-							<img decoding="async" src="<?php echo esc_url( $full_src ); ?>" alt="<?php echo esc_attr( get_the_title( $post_id ) ); ?>">
-						</picture>
-					<?php else : ?>
-						<?php echo get_the_post_thumbnail( $post_id, 'cartellone-thumbnail', array( 'style' => 'width: 100%;' ) ); ?>
-					<?php endif; ?>
+					<?php echo get_the_post_thumbnail( $post_id, 'cartellone-thumbnail', array( /* 'style' => 'width: 100%;' */ ) ); ?>
 				</a>
 			<?php else : ?>
 				<div class="post-img-placeholder"></div>
